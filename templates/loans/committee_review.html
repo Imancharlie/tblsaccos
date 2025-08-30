@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Committee Review - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-users text-primary me-2"></i>Committee Review
+                </h1>
+                <p class="text-muted mb-0">Final committee review of loan application</p>
+            </div>
+            <a href="{% url 'loans:tracker' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Tracker
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Loan Application Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Applicant:</strong> {{ loan.applicant.get_full_name }}</p>
+                        <p><strong>Loan Type:</strong> {{ loan.loan_type.get_name_display }}</p>
+                        <p><strong>Purpose:</strong> {{ loan.get_purpose_display }}</p>
+                        <p><strong>Original Amount:</strong> TZS {{ loan.amount|floatformat:0 }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Period:</strong> {{ loan.period }} months</p>
+                        <p><strong>Department:</strong> {{ loan.department }}</p>
+                        <p><strong>Phone:</strong> {{ loan.phone_number }}</p>
+                        <p><strong>Applied:</strong> {{ loan.created_at|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="text-primary mb-3">Collateral Summary</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Savings Value:</strong> TZS {{ loan.savings_value|floatformat:0 }}</p>
+                        <p><strong>Shares Value:</strong> TZS {{ loan.shares_value|floatformat:0 }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if loan.collateral1_description %}
+                            <p><strong>Additional Collateral 1:</strong> {{ loan.collateral1_description }}</p>
+                            <p><strong>Value:</strong> TZS {{ loan.collateral1_value|floatformat:0 }}</p>
+                        {% endif %}
+                        {% if loan.collateral2_description %}
+                            <p><strong>Additional Collateral 2:</strong> {{ loan.collateral2_description }}</p>
+                            <p><strong>Value:</strong> TZS {{ loan.collateral2_value|floatformat:0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="text-primary mb-3">Approval Chain Status</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">Guarantors</h6>
+                                {% for approval in loan.guarantor_approvals.all %}
+                                    <p class="mb-1">
+                                        <span class="badge bg-success">{{ approval.guarantor.get_full_name }} - Approved</span>
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">HR Review</h6>
+                                {% for review in loan.hr_reviews.all %}
+                                    <p class="mb-1">
+                                        <span class="badge bg-success">HR Approved</span>
+                                    </p>
+                                    <p class="mb-1"><small><strong>Salary:</strong> TZS {{ review.monthly_salary|floatformat:0 }}/month</small></p>
+                                    <p class="mb-1"><small><strong>Employer Debts:</strong> TZS {{ review.employer_debts|floatformat:0 }}</small></p>
+                                    <p class="mb-1"><small><strong>Financial Debts:</strong> TZS {{ review.financial_debts|floatformat:0 }}</small></p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">Loan Officer Review</h6>
+                                {% for review in loan.loan_officer_reviews.all %}
+                                    <p class="mb-1">
+                                        <span class="badge bg-success">Loan Officer Approved</span>
+                                    </p>
+                                    {% if review.approved_amount and review.approved_amount != loan.amount %}
+                                        <p class="mb-1"><small><strong>Adjusted Amount:</strong> TZS {{ review.approved_amount|floatformat:0 }}</small></p>
+                                    {% endif %}
+                                    {% if review.comments %}
+                                        <p class="mb-1"><small><strong>Comments:</strong> {{ review.comments }}</small></p>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-gavel me-2"></i>Committee Final Decision</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">Final Loan Amount Decision</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.final_amount.id_for_label }}" class="form-label">
+                                        <i class="fas fa-coins me-1"></i>Kiasi cha Mwisho cha Mkopo TZS
+                                    </label>
+                                    {{ form.final_amount }}
+                                    {% if form.final_amount.errors %}
+                                        <div class="text-danger small mt-1">{{ form.final_amount.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text text-muted">
+                                        Acha tupu kama unataka kukubali kiasi cha sasa (TZS {{ loan.amount|floatformat:0 }})
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-calculator me-1"></i>Mpango wa Malipo
+                                    </label>
+                                    <div class="form-control-plaintext">
+                                        {% if loan.monthly_repayment %}
+                                            <strong>Monthly Payment:</strong> TZS {{ loan.monthly_repayment|floatformat:0 }}<br>
+                                            <strong>Total Interest:</strong> TZS {{ loan.total_interest|floatformat:0 }}<br>
+                                            <strong>Total Amount:</strong> TZS {{ loan.total_amount|floatformat:0 }}
+                                        {% else %}
+                                            <em class="text-muted">Will be calculated after approval</em>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.is_approved }}
+                            <label class="form-check-label" for="{{ form.is_approved.id_for_label }}">
+                                <strong>Kamati inakubali maombi haya ya mkopo</strong>
+                            </label>
+                            {% if form.is_approved.errors %}
+                                <div class="text-danger small mt-1">{{ form.is_approved.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.comments.id_for_label }}" class="form-label">
+                            <i class="fas fa-comment me-1"></i>Maoni au Ushauri wa Kamati
+                        </label>
+                        {{ form.comments }}
+                        {% if form.comments.errors %}
+                            <div class="text-danger small mt-1">{{ form.comments.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted">
+                            Eleza sababu ya kubadilisha kiasi au kutoa maoni yoyote ya kamati
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Hii ni hatua ya mwisho ya maombi. Unaweza kubadilisha kiasi au kukatali
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-gavel me-1"></i>Submit Committee Decision
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Committee Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Final Decision Authority</h6>
+                    <ul class="list-unstyled text-muted mb-0">
+                        <li><i class="fas fa-gavel text-warning me-2"></i>This is the final decision</li>
+                        <li><i class="fas fa-gavel text-warning me-2"></i>Can approve or reject</li>
+                        <li><i class="fas fa-gavel text-warning me-2"></i>Can adjust final amount</li>
+                        <li><i class="fas fa-gavel text-warning me-2"></i>Decision is binding</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Review Checklist</h6>
+                    <ul class="list-unstyled text-muted mb-0">
+                        <li><i class="fas fa-check text-success me-2"></i>All guarantors approved</li>
+                        <li><i class="fas fa-check text-success me-2"></i>HR review completed</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Loan officer reviewed</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Collateral is adequate</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Amount is reasonable</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">After Approval</h6>
+                    <ol class="list-unstyled text-muted mb-0">
+                        <li class="mb-2"><strong>1.</strong> Repayment schedule generated</li>
+                        <li class="mb-2"><strong>2.</strong> Loan can be disbursed</li>
+                        <li class="mb-2"><strong>3.</strong> Applicant notified</li>
+                        <li class="mb-2"><strong>4.</strong> Monitoring begins</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const isApproved = document.getElementById('{{ form.is_approved.id_for_label }}');
+    const finalAmount = document.getElementById('{{ form.final_amount.id_for_label }}');
+    const currentAmount = {{ loan.amount }};
+    
+    // Set initial value to current amount
+    if (!finalAmount.value) {
+        finalAmount.value = currentAmount;
+    }
+    
+    form.addEventListener('submit', function(e) {
+        const amount = parseFloat(finalAmount.value) || 0;
+        
+        if (amount === 0) {
+            e.preventDefault();
+            alert('Lazima ujaze kiasi cha mkopo');
+            return false;
+        }
+        
+        if (amount > currentAmount) {
+            e.preventDefault();
+            alert('Hauwezi kuongeza kiasi cha mkopo zaidi ya kiasi cha sasa');
+            return false;
+        }
+        
+        if (amount < currentAmount * 0.3) {
+            if (!confirm('Una uhakika unataka kupunguza kiasi cha mkopo zaidi ya 70%? Hii inaweza kuwa na athari kubwa kwa mkopaji.')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        if (!isApproved.checked) {
+            if (!confirm('Una uhakika unataka kukatali maombi haya? Hii itakuwa uamuzi wa mwisho.')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        if (amount !== currentAmount) {
+            if (!confirm(`Una uhakika unataka kubadilisha kiasi cha mkopo kutoka TZS ${currentAmount.toLocaleString()} hadi TZS ${amount.toLocaleString()}?`)) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        if (isApproved.checked) {
+            if (!confirm('Una uhakika unataka kukubali maombi haya? Hii itakuwa uamuzi wa mwisho na mkopo utaweza kusambazwa.')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+    
+    // Update amount field when typing
+    finalAmount.addEventListener('input', function() {
+        const amount = parseFloat(this.value) || 0;
+        if (amount > currentAmount) {
+            this.setCustomValidity('Kiasi hakiwezi kuwa zaidi ya kiasi cha sasa');
+        } else if (amount < 1000) {
+            this.setCustomValidity('Kiasi cha chini ni TZS 1,000');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+

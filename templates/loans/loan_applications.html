@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Loan Applications - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-file-alt text-primary me-2"></i>My Loan Applications
+                </h1>
+                <p class="text-muted mb-0">Track the status of all your loan applications</p>
+            </div>
+            <a href="{% url 'loans:apply_loan' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Application
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Application History</h5>
+            </div>
+            <div class="card-body">
+                {% if loan_applications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Application ID</th>
+                                    <th>Purpose</th>
+                                    <th>Amount</th>
+                                    <th>Period</th>
+                                    <th>Status</th>
+                                    <th>Applied Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in loan_applications %}
+                                <tr>
+                                    <td>
+                                        <strong>#{{ application.id }}</strong>
+                                    </td>
+                                    <td>{{ application.purpose }}</td>
+                                    <td>TZS {{ application.amount|floatformat:0 }}</td>
+                                    <td>{{ application.period }} months</td>
+                                    <td>
+                                        {% if application.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif application.status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif application.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% elif application.status == 'under_review' %}
+                                            <span class="badge bg-info">Under Review</span>
+                                        {% elif application.status == 'guarantor_approval' %}
+                                            <span class="badge bg-primary">Guarantor Approval</span>
+                                        {% elif application.status == 'hr_review' %}
+                                            <span class="badge bg-secondary">HR Review</span>
+                                        {% elif application.status == 'committee_review' %}
+                                            <span class="badge bg-dark">Committee Review</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ application.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ application.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'loans:application_detail' application.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No loan applications yet</h5>
+                        <p class="text-muted mb-3">You haven't submitted any loan applications yet.</p>
+                        <a href="{% url 'loans:apply_loan' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Apply for Your First Loan
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Application Status Guide -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Application Status Guide</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">Application Process</h6>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Application Submitted</h6>
+                                    <p class="text-muted small mb-0">Your application is received and under initial review</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-info"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Guarantor Approval</h6>
+                                    <p class="text-muted small mb-0">Waiting for your guarantor to approve</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">HR Review</h6>
+                                    <p class="text-muted small mb-0">HR department reviewing your employment details</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-dark"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Committee Review</h6>
+                                    <p class="text-muted small mb-0">Loan committee making final decision</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Approved</h6>
+                                    <p class="text-muted small mb-0">Loan approved and disbursed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">Status Meanings</h6>
+                        <div class="status-guide">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-warning me-2">Pending</span>
+                                <span class="text-muted small">Initial submission, waiting for processing</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-primary me-2">Guarantor Approval</span>
+                                <span class="text-muted small">Waiting for guarantor to approve</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-secondary me-2">HR Review</span>
+                                <span class="text-muted small">HR verifying employment details</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-dark me-2">Committee Review</span>
+                                <span class="text-muted small">Loan committee evaluating</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-success me-2">Approved</span>
+                                <span class="text-muted small">Loan approved and active</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-danger me-2">Rejected</span>
+                                <span class="text-muted small">Application not approved</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    padding-left: 10px;
+}
+
+.status-guide .badge {
+    min-width: 120px;
+}
+</style>
+{% endblock %}
+
+
+
+
+

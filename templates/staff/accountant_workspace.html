@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accountant Workspace - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>
+                <i class="fas fa-credit-card me-2"></i>Payment Processing Workspace
+            </h2>
+            <p>Process payments for approved loan applications</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'staff:payment_history' %}" class="btn btn-outline-primary">
+                <i class="fas fa-history me-2"></i>Payment History
+            </a>
+            <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-icon" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="stats-card-content">
+                <h3>{{ pending_applications.count }}</h3>
+                <p>Pending Payments</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-icon" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stats-card-content">
+                <h3>TZS {{ total_amount|floatformat:0 }}</h3>
+                <p>Total Amount</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-icon" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stats-card-content">
+                <h3>{{ pending_applications.count }}</h3>
+                <p>Applications Ready</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Applications -->
+{% if pending_applications %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-clock me-2"></i>Applications Awaiting Payment Processing
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Application ID</th>
+                        <th>Applicant</th>
+                        <th>Loan Type</th>
+                        <th>Amount</th>
+                        <th>Period</th>
+                        <th>Committee Approval Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in pending_applications %}
+                    <tr>
+                        <td>
+                            <strong>#{{ application.id }}</strong>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm me-2">
+                                    {% if application.applicant.profile.profile_picture %}
+                                        <img src="{{ application.applicant.profile.profile_picture.url }}" 
+                                             alt="Profile" class="rounded-circle" width="32" height="32">
+                                    {% else %}
+                                        <div class="avatar-placeholder">
+                                            {{ application.applicant.first_name|first }}{{ application.applicant.last_name|first }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ application.applicant.get_full_name }}</div>
+                                    <small class="text-muted">{{ application.department }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ application.loan_type.get_name_display }}</span>
+                        </td>
+                        <td>
+                            <div class="text-primary fw-bold">TZS {{ application.final_approved_amount|floatformat:0 }}</div>
+                            {% if application.final_approved_amount != application.amount %}
+                                <small class="text-muted">Original: TZS {{ application.amount|floatformat:0 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ application.period }} months</span>
+                        </td>
+                        <td>
+                            {% if application.committee_approval_date %}
+                                <div class="text-success">{{ application.committee_approval_date|date:"M d, Y" }}</div>
+                                <small class="text-muted">{{ application.committee_approval_date|date:"H:i" }}</small>
+                            {% else %}
+                                <span class="text-muted">Not set</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'loans:accountant_review' application.pk %}" 
+                                   class="btn btn-primary btn-sm">
+                                    <i class="fas fa-credit-card me-1"></i>Process Payment
+                                </a>
+                                <a href="{% url 'loans:application_detail' application.pk %}" 
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- No Pending Applications -->
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+        <h5 class="text-success">No Pending Payments</h5>
+        <p class="text-muted mb-0">All approved loan applications have been processed for payment.</p>
+        <div class="mt-3">
+            <a href="{% url 'staff:payment_history' %}" class="btn btn-outline-primary">
+                <i class="fas fa-history me-2"></i>View Payment History
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.stats-card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stats-card-content h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.stats-card-content p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .page-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .stats-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .stats-card-content h3 {
+        font-size: 1.5rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+

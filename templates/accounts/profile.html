@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - {{ user.get_full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-picture-container {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        float: right;
+        margin-left: 20px;
+    }
+    
+    .profile-pic {
+        transition: all 0.3s ease;
+    }
+    
+    .profile-pic-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(122, 36, 30, 0.8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .profile-picture-container:hover .profile-pic-overlay {
+        opacity: 1;
+    }
+    
+    .profile-picture-container:hover .profile-pic {
+        transform: scale(1.05);
+        border-color: var(--deep-maroon);
+    }
+    
+    .profile-picture-container:hover {
+        cursor: pointer;
+    }
+    
+    .profile-picture-container:hover label {
+        background-color: var(--deep-maroon);
+        border-color: var(--deep-maroon);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Profile</h3>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Profile Picture Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            <form method="post" enctype="multipart/form-data" class="d-inline">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <input type="file" name="profile_picture" id="profile_picture" class="form-control" accept="image/*" style="display: none;">
+                                    <div class="profile-picture-container mb-3 position-relative" onclick="document.getElementById('profile_picture').click();">
+                                        {% if user_profile.profile_picture %}
+                                            <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-pic" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--border-color);">
+                                        {% else %}
+                                            <img src="/static/tblsaccos_logo.png" alt="Default Profile" class="img-fluid rounded-circle profile-pic" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid var(--border-color);">
+                                        {% endif %}
+                                        <div class="profile-pic-overlay">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <small class="text-muted">Click on the picture to change it</small>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Basic Information</h5>
+                                    <p><strong>Username:</strong> {{ user.username }}</p>
+                                    <p><strong>Full Name:</strong> {{ user.get_full_name }}</p>
+                                    <p><strong>Email:</strong> {{ user.email }}</p>
+                                    {% if user_profile %}
+                                        <p><strong>User Type:</strong> {{ user_profile.get_user_type_display }}</p>
+                                        <p><strong>Phone Number:</strong> {{ user_profile.phone_number|default:"Not provided" }}</p>
+                                        <p><strong>Employee ID:</strong> {{ user_profile.employee_id|default:"Not provided" }}</p>
+                                        <p><strong>Department:</strong> {{ user_profile.department|default:"Not provided" }}</p>
+                                        <p><strong>Date Joined:</strong> {{ user_profile.date_joined|date:"F j, Y" }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {% if member_profile %}
+                                        <h5>Member Information</h5>
+                                        <p><strong>Bank Name:</strong> {{ member_profile.bank_name|default:"Not provided" }}</p>
+                                        <p><strong>Account Number:</strong> {{ member_profile.account_number|default:"Not provided" }}</p>
+                                        <p><strong>Salary Number:</strong> {{ member_profile.salary_number|default:"Not provided" }}</p>
+                                        <p><strong>Monthly Salary:</strong> ${{ member_profile.monthly_salary|default:"0.00" }}</p>
+                                        <p><strong>Total Savings:</strong> ${{ member_profile.total_savings|default:"0.00" }}</p>
+                                        <p><strong>Total Shares:</strong> ${{ member_profile.total_shares|default:"0.00" }}</p>
+                                        <p><strong>Available Balance:</strong> ${{ member_profile.available_balance|default:"0.00" }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if member_profile and form %}
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Update Member Profile</h5>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.bank_name.id_for_label }}" class="form-label">Bank Name</label>
+                                            {{ form.bank_name }}
+                                            {% if form.bank_name.errors %}
+                                                <div class="text-danger">{{ form.bank_name.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.account_number.id_for_label }}" class="form-label">Account Number</label>
+                                            {{ form.account_number }}
+                                            {% if form.account_number.errors %}
+                                                <div class="text-danger">{{ form.account_number.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.salary_number.id_for_label }}" class="form-label">Salary Number</label>
+                                            {{ form.salary_number }}
+                                            {% if form.salary_number.errors %}
+                                                <div class="text-danger">{{ form.salary_number.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.monthly_salary.id_for_label }}" class="form-label">Monthly Salary</label>
+                                            {{ form.monthly_salary }}
+                                            {% if form.monthly_salary.errors %}
+                                                <div class="text-danger">{{ form.monthly_salary.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profilePictureInput = document.getElementById('profile_picture');
+    const profilePictureContainer = document.querySelector('.profile-picture-container');
+    
+    profilePictureInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            // Show loading state
+            profilePictureContainer.style.opacity = '0.7';
+            profilePictureContainer.style.pointerEvents = 'none';
+            
+            // Add loading spinner
+            const overlay = profilePictureContainer.querySelector('.profile-pic-overlay');
+            overlay.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            overlay.style.opacity = '1';
+            
+            // Auto-submit the form when a file is selected
+            this.closest('form').submit();
+        }
+    });
+});
+</script>
+{% endblock %}

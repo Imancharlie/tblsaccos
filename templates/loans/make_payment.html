@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Make Payment - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-credit-card text-primary me-2"></i>Make Payment
+                </h1>
+                <p class="text-muted mb-0">Payment for Loan #{{ loan.id }} - {{ loan.purpose }}</p>
+            </div>
+            <a href="{% url 'loans:loan_detail' loan.id %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Loan Details
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Payment Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.amount.id_for_label }}" class="form-label">
+                                    <i class="fas fa-coins me-1"></i>Payment Amount (TZS) *
+                                </label>
+                                {{ form.amount }}
+                                {% if form.amount.errors %}
+                                    <div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text text-muted">
+                                    Minimum: TZS {{ loan.monthly_payment|floatformat:0 }} | 
+                                    Remaining: TZS {{ loan.remaining_balance|floatformat:0 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.payment_method.id_for_label }}" class="form-label">
+                                    <i class="fas fa-credit-card me-1"></i>Payment Method *
+                                </label>
+                                {{ form.payment_method }}
+                                {% if form.payment_method.errors %}
+                                    <div class="text-danger small mt-1">{{ form.payment_method.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.payment_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>Payment Date *
+                                </label>
+                                {{ form.payment_date }}
+                                {% if form.payment_date.errors %}
+                                    <div class="text-danger small mt-1">{{ form.payment_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.reference_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-hashtag me-1"></i>Reference Number
+                                </label>
+                                {{ form.reference_number }}
+                                {% if form.reference_number.errors %}
+                                    <div class="text-danger small mt-1">{{ form.reference_number.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text text-muted">Transaction ID or receipt number</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            <i class="fas fa-sticky-note me-1"></i>Payment Notes (Optional)
+                        </label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>
+                        {% endif %}
+                        <div class="text-muted small">Any additional information about this payment</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.proof_of_payment.id_for_label }}" class="form-label">
+                            <i class="fas fa-paperclip me-1"></i>Proof of Payment (Optional)
+                        </label>
+                        {{ form.proof_of_payment }}
+                        {% if form.proof_of_payment.errors %}
+                            <div class="text-danger small mt-1">{{ form.proof_of_payment.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted">Upload receipt, screenshot, or bank statement (PDF, JPG, PNG)</div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Fields marked with * are required
+                        </div>
+                        <div>
+                            <button type="reset" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-eraser me-1"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i>Submit Payment
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Loan Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Loan Details</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Loan ID:</span>
+                        <span class="fw-bold">#{{ loan.id }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Purpose:</span>
+                        <span class="fw-bold">{{ loan.purpose }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Original Amount:</span>
+                        <span class="fw-bold">TZS {{ loan.amount|floatformat:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Period:</span>
+                        <span class="fw-bold">{{ loan.period }} months</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Payment Status</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Monthly Payment:</span>
+                        <span class="fw-bold">TZS {{ loan.monthly_payment|floatformat:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Paid:</span>
+                        <span class="fw-bold text-success">TZS {{ loan.total_paid|floatformat:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Remaining:</span>
+                        <span class="fw-bold text-danger">TZS {{ loan.remaining_balance|floatformat:0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Progress:</span>
+                        <span class="fw-bold">{{ loan.payment_percentage|floatformat:1 }}%</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Payment Progress</h6>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ loan.payment_percentage }}%"
+                             aria-valuenow="{{ loan.payment_percentage }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ loan.payments_made }}/{{ loan.period }} payments completed</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Payment Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled text-muted small mb-0">
+                    <li><i class="fas fa-check text-success me-2"></i>Pay at least the monthly amount</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Keep proof of payment for records</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Pay on time to avoid penalties</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Contact support if you have issues</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default payment date to today
+    const paymentDateInput = document.getElementById('{{ form.payment_date.id_for_label }}');
+    if (paymentDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        paymentDateInput.value = today;
+    }
+    
+    // Amount validation
+    const amountInput = document.getElementById('{{ form.amount.id_for_label }}');
+    if (amountInput) {
+        amountInput.addEventListener('input', function() {
+            const amount = parseFloat(this.value);
+            const remaining = {{ loan.remaining_balance }};
+            const monthly = {{ loan.monthly_payment }};
+            
+            if (amount > remaining) {
+                this.setCustomValidity('Amount cannot exceed remaining balance');
+            } else if (amount < monthly) {
+                this.setCustomValidity('Amount should be at least monthly payment');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+

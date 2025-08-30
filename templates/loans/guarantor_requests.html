@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Guarantor Requests - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>
+                <i class="fas fa-shield-alt me-2"></i>Guarantor Requests
+            </h2>
+            <p>Review and respond to loan applications where you are listed as a guarantor</p>
+        </div>
+        <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary" style="color: white;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+<!-- Pending Requests -->
+{% if pending_requests %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h5 class="text-warning mb-3">
+            <i class="fas fa-clock me-2"></i>Pending Requests ({{ pending_requests|length }})
+        </h5>
+        
+        {% for request_data in pending_requests %}
+        <div class="loan-card mb-3">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-file-contract me-2"></i>Application #{{ request_data.application.id }} - {{ request_data.application.get_purpose_display }}
+                    </h6>
+                    <span class="badge bg-warning">Pending Your Response</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-2" style="font-size: 0.8rem;">Applicant Details</h6>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Applicant</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">{{ request_data.application.applicant.get_full_name }}</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Department</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">{{ request_data.application.department }}</div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Loan Type</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">{{ request_data.application.loan_type.get_name_display }}</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Amount</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">TZS {{ request_data.application.amount|floatformat:0 }}</div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Period</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">{{ request_data.application.period }} months</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Applied Date</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">{{ request_data.application.created_at|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-2" style="font-size: 0.8rem;">Your Response</h6>
+                        <form class="guarantor-response-form" data-application-id="{{ request_data.application.id }}">
+                            <div class="mb-2">
+                                <label for="comment_{{ request_data.application.id }}" class="form-label" style="font-size: 0.75rem;">
+                                    <i class="fas fa-comment me-1"></i>Comment (Optional)
+                                </label>
+                                <textarea 
+                                    class="form-control form-control-sm" 
+                                    id="comment_{{ request_data.application.id }}" 
+                                    name="comment" 
+                                    rows="2" 
+                                    placeholder="Add your comments here..."
+                                    style="font-size: 0.75rem;"></textarea>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-success btn-sm approve-btn" 
+                                        data-application-id="{{ request_data.application.id }}">
+                                    <i class="fas fa-check me-1"></i>Approve
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm reject-btn" 
+                                        data-application-id="{{ request_data.application.id }}">
+                                    <i class="fas fa-times me-1"></i>Reject
+                                </button>
+                                <a href="{% url 'loans:application_detail' request_data.application.id %}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Completed Requests -->
+{% if completed_requests %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h5 class="text-success mb-3">
+            <i class="fas fa-check-circle me-2"></i>Completed Responses ({{ completed_requests|length }})
+        </h5>
+        
+        {% for request_data in completed_requests %}
+        <div class="loan-card mb-3">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-file-contract me-2"></i>Application #{{ request_data.application.id }} - {{ request_data.application.get_purpose_display }}
+                    </h6>
+                    <span class="badge bg-{% if request_data.status == 'approved' %}success{% else %}danger{% endif %}">
+                        {{ request_data.status|title }}d
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-2" style="font-size: 0.8rem;">Application Summary</h6>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Applicant</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">{{ request_data.application.applicant.get_full_name }}</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Amount</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">TZS {{ request_data.application.amount|floatformat:0 }}</div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Your Response</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">
+                                    <span class="text-{% if request_data.status == 'approved' %}success{% else %}danger{% endif %}">
+                                        {{ request_data.status|title }}d
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted" style="font-size: 0.7rem;">Response Date</small>
+                                <div class="fw-bold" style="font-size: 0.8rem;">{{ request_data.approval.approved_at|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-2" style="font-size: 0.8rem;">Your Comment</h6>
+                        {% if request_data.approval.comment %}
+                            <p class="mb-2" style="font-size: 0.8rem;">{{ request_data.approval.comment }}</p>
+                        {% else %}
+                            <p class="text-muted mb-2" style="font-size: 0.8rem;"><em>No comment provided</em></p>
+                        {% endif %}
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'loans:application_detail' request_data.application.id %}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- No Requests -->
+{% if not pending_requests and not completed_requests %}
+<div class="row">
+    <div class="col-12">
+        <div class="loan-card text-center py-5">
+            <i class="fas fa-shield-alt fa-2x text-muted mb-3"></i>
+            <h5 class="text-muted">No Pending Guarantor Requests</h5>
+            <p class="text-muted mb-0">You don't have any pending loan applications to review as a guarantor.</p>
+            <div class="mt-3">
+                <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Response Modal -->
+<div class="modal fade" id="responseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Your Response</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to <span id="actionText"></span> this loan application?</p>
+                <p class="text-muted small">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmResponse">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentApplicationId = null;
+    let currentAction = null;
+    
+    // Handle approve button clicks
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentApplicationId = this.dataset.applicationId;
+            currentAction = 'approve';
+            document.getElementById('actionText').textContent = 'approve';
+            document.getElementById('confirmResponse').className = 'btn btn-success';
+            new bootstrap.Modal(document.getElementById('responseModal')).show();
+        });
+    });
+    
+    // Handle reject button clicks
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentApplicationId = this.dataset.applicationId;
+            currentAction = 'reject';
+            document.getElementById('actionText').textContent = 'reject';
+            document.getElementById('confirmResponse').className = 'btn btn-danger';
+            new bootstrap.Modal(document.getElementById('responseModal')).show();
+        });
+    });
+    
+    // Handle confirm response
+    document.getElementById('confirmResponse').addEventListener('click', function() {
+        if (!currentApplicationId || !currentAction) return;
+        
+        const comment = document.querySelector(`#comment_${currentApplicationId}`).value;
+        
+        // Send AJAX request
+        fetch(`/loans/guarantor-approve-reject/${currentApplicationId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `action=${currentAction}&comment=${encodeURIComponent(comment)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message and reload page
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        })
+        .finally(() => {
+            bootstrap.Modal.getInstance(document.getElementById('responseModal')).hide();
+        });
+    });
+});
+</script>
+
+<!-- Add CSRF token for AJAX requests -->
+{% csrf_token %}
+
+<style>
+/* Custom styling for guarantor requests */
+.guarantor-response-form {
+    background: rgba(139, 0, 0, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(139, 0, 0, 0.1);
+}
+
+.form-control-sm {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.btn-sm {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.7rem;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.6rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header {
+        padding: 0.75rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .card-header {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .card-body {
+        padding: 0.5rem;
+    }
+    
+    .guarantor-response-form {
+        padding: 0.75rem;
+    }
+}
+</style>
+{% endblock %}
+
+

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}My Shares - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">My Shares</h1>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'shares:buy_shares' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Buy More Shares
+                    </a>
+                    <a href="{% url 'shares:shares_history' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-history me-2"></i>Transaction History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shares Summary -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Shares</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_shares|default:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-pie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Share Value</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">KES {{ share_value|default:0|floatformat:0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Current Price</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">KES {{ current_price|default:100 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tag fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Last Purchase</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ last_purchase_date|default:"Never" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shares Details -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Shares Information</h6>
+                </div>
+                <div class="card-body">
+                    {% if total_shares > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Share Type</th>
+                                    <th>Quantity</th>
+                                    <th>Purchase Price</th>
+                                    <th>Current Value</th>
+                                    <th>Purchase Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ordinary Shares</td>
+                                    <td>{{ total_shares }}</td>
+                                    <td>KES {{ average_purchase_price|default:100|floatformat:0 }}</td>
+                                    <td>KES {{ share_value|default:0|floatformat:0 }}</td>
+                                    <td>{{ last_purchase_date|default:"N/A" }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-pie fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Shares Yet</h4>
+                        <p class="text-muted">You haven't purchased any shares yet. Start building your investment portfolio!</p>
+                        <a href="{% url 'shares:buy_shares' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Buy Your First Shares
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+

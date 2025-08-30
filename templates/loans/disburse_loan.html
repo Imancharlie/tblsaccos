@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Disburse Loan - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>
+                <i class="fas fa-check-circle me-2"></i>Disburse Loan
+            </h2>
+            <p>Mark loan application #{{ loan.id }} as disbursed</p>
+        </div>
+        <a href="{% url 'loans:application_detail' loan.pk %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Application
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Application Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Application Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Applicant:</strong> {{ loan.applicant.get_full_name }}</p>
+                        <p><strong>Loan Type:</strong> {{ loan.loan_type.get_name_display }}</p>
+                        <p><strong>Purpose:</strong> {{ loan.get_purpose_display }}</p>
+                        <p><strong>Final Approved Amount:</strong> <span class="text-primary fw-bold">TZS {{ loan.final_approved_amount|floatformat:0 }}</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Period:</strong> {{ loan.period }} months</p>
+                        <p><strong>Monthly Repayment:</strong> <span class="text-success fw-bold">TZS {{ loan.monthly_repayment|floatformat:0 }}</span></p>
+                        <p><strong>Bank:</strong> {{ loan.bank_name }}</p>
+                        <p><strong>Account:</strong> {{ loan.account_number }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disbursement Confirmation -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-check-circle text-success"></i> Confirm Disbursement</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Payment Processing Complete!</strong> This loan application has been processed for payment and is ready to be marked as disbursed.
+                </div>
+                
+                <div class="disbursement-details mb-4">
+                    <h6 class="text-primary mb-3">Disbursement Details</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Payment Method:</strong> 
+                                {% if loan.accountant_reviews.first %}
+                                    {{ loan.accountant_reviews.first.payment_method }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </p>
+                            <p><strong>Processing Date:</strong> 
+                                {% if loan.payment_processing_date %}
+                                    {{ loan.payment_processing_date|date:"F d, Y H:i" }}
+                                {% else %}
+                                    Not set
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Accountant:</strong> 
+                                {% if loan.accountant_reviews.first %}
+                                    {{ loan.accountant_reviews.first.accountant.get_full_name }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </p>
+                            <p><strong>Current Status:</strong> <span class="badge bg-warning">Payment Processing</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong> Once you mark this loan as disbursed, it cannot be undone. Please ensure all payment processing is complete.
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle me-2"></i>Confirm Disbursement
+                        </button>
+                        <a href="{% url 'loans:application_detail' loan.pk %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Workflow Status -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-tasks"></i> Workflow Progress</h6>
+            </div>
+            <div class="card-body">
+                <div class="workflow-status-compact">
+                    <div class="status-step completed">
+                        <i class="fas fa-shield-alt text-success"></i>
+                        <span>Guarantor Approved</span>
+                    </div>
+                    <div class="status-step completed">
+                        <i class="fas fa-user-tie text-success"></i>
+                        <span>HR Reviewed</span>
+                    </div>
+                    <div class="status-step completed">
+                        <i class="fas fa-user-check text-success"></i>
+                        <span>Loan Officer Approved</span>
+                    </div>
+                    <div class="status-step completed">
+                        <i class="fas fa-users text-success"></i>
+                        <span>Committee Approved</span>
+                    </div>
+                    <div class="status-step completed">
+                        <i class="fas fa-credit-card text-success"></i>
+                        <span>Payment Processing</span>
+                    </div>
+                    <div class="status-step active">
+                        <i class="fas fa-check-circle text-primary"></i>
+                        <span>Ready for Disbursement</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'loans:accountant_review' loan.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>Edit Payment Details
+                    </a>
+                    <a href="{% url 'loans:export_pdf' loan.pk %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-download me-1"></i>Export PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.workflow-status-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.status-step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    background: #f8f9fa;
+    border-left: 3px solid #dee2e6;
+}
+
+.status-step.completed {
+    background: #d4edda;
+    border-left-color: #28a745;
+}
+
+.status-step.active {
+    background: #cce7ff;
+    border-left-color: #007bff;
+}
+
+.status-step i {
+    width: 20px;
+    text-align: center;
+}
+
+.status-step span {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.disbursement-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .page-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+}
+</style>
+{% endblock %}
+

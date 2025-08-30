@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Settings</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Password Change -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Change Password</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'accounts:change_password' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="current_password" class="form-label">Current Password</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="new_password1" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                                <small class="text-muted">Password must be at least 8 characters long</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="new_password2" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key me-2"></i>Change Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Profile Settings -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Profile Settings</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'accounts:update_profile' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ user.profile.phone_number|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Notification Settings -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Notification Settings</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'accounts:update_notifications' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="email_notifications" name="email_notifications" checked>
+                                <label class="form-check-label" for="email_notifications">
+                                    Email Notifications
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="sms_notifications" name="sms_notifications">
+                                <label class="form-check-label" for="sms_notifications">
+                                    SMS Notifications
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="loan_updates" name="loan_updates" checked>
+                                <label class="form-check-label" for="loan_updates">
+                                    Loan Status Updates
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="announcements" name="announcements" checked>
+                                <label class="form-check-label" for="announcements">
+                                    Announcements
+                                </label>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-bell me-2"></i>Save Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Security Settings</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary">Two-Factor Authentication</h6>
+                        <p class="text-muted small">Add an extra layer of security to your account</p>
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-shield-alt me-2"></i>Enable 2FA
+                        </a>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary">Login History</h6>
+                        <p class="text-muted small">View your recent login activity</p>
+                        <a href="#" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-history me-2"></i>View History
+                        </a>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary">Account Deletion</h6>
+                        <p class="text-muted small">Permanently delete your account</p>
+                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            <i class="fas fa-trash me-2"></i>Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountModalLabel">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.
+                </div>
+                <p>Are you sure you want to delete your account? This will remove:</p>
+                <ul>
+                    <li>All loan applications</li>
+                    <li>Share purchases</li>
+                    <li>Profile information</li>
+                    <li>Account settings</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+

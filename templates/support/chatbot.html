@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Support Chat - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Support Chat</h1>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'support:faq' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-question-circle me-2"></i>FAQ
+                    </a>
+                    <a href="{% url 'support:tickets' %}" class="btn btn-outline-info">
+                        <i class="fas fa-ticket-alt me-2"></i>Support Tickets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Chat with Support</h6>
+                </div>
+                <div class="card-body">
+                    <div id="chat-container" class="border rounded p-3 mb-3" style="height: 400px; overflow-y: auto; background-color: #f8f9fa;">
+                        <div id="chat-messages">
+                            <!-- Chat messages will appear here -->
+                        </div>
+                    </div>
+                    
+                    <form id="chat-form" class="d-flex gap-2">
+                        <input type="text" id="message-input" class="form-control" placeholder="Type your message here..." required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Help</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary">Common Questions</h6>
+                        <div class="list-group list-group-flush">
+                            <button class="list-group-item list-group-item-action quick-question" data-question="How do I apply for a loan?">
+                                <i class="fas fa-handshake me-2"></i>Loan Application
+                            </button>
+                            <button class="list-group-item list-group-item-action quick-question" data-question="How do I buy shares?">
+                                <i class="fas fa-chart-pie me-2"></i>Buying Shares
+                            </button>
+                            <button class="list-group-item list-group-item-action quick-question" data-question="What documents do I need?">
+                                <i class="fas fa-file-alt me-2"></i>Required Documents
+                            </button>
+                            <button class="list-group-item list-group-item-action quick-question" data-question="How do I check my loan status?">
+                                <i class="fas fa-search me-2"></i>Check Loan Status
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Contact Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary">Phone Support</h6>
+                        <p class="mb-1"><i class="fas fa-phone me-2"></i>+255 123 456 789</p>
+                        <small class="text-muted">Available Mon-Fri, 8AM-5PM</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary">Email Support</h6>
+                        <p class="mb-1"><i class="fas fa-envelope me-2"></i>support@tblsaccos.co.tz</p>
+                        <small class="text-muted">Response within 24 hours</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary">Office Hours</h6>
+                        <p class="mb-1"><i class="fas fa-clock me-2"></i>Monday - Friday</p>
+                        <p class="mb-1"><i class="fas fa-clock me-2"></i>8:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.getElementById('chat-container');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const quickQuestions = document.querySelectorAll('.quick-question');
+
+    // Add welcome message
+    addMessage('bot', 'Hello! Welcome to TBL SACCOS Support. How can I help you today?');
+
+    // Handle form submission
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (message) {
+            addMessage('user', message);
+            messageInput.value = '';
+            
+            // Simulate bot response
+            setTimeout(() => {
+                const response = generateBotResponse(message);
+                addMessage('bot', response);
+            }, 1000);
+        }
+    });
+
+    // Handle quick questions
+    quickQuestions.forEach(button => {
+        button.addEventListener('click', function() {
+            const question = this.dataset.question;
+            addMessage('user', question);
+            
+            setTimeout(() => {
+                const response = generateBotResponse(question);
+                addMessage('bot', response);
+            }, 1000);
+        });
+    });
+
+    function addMessage(sender, message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `mb-3 ${sender === 'user' ? 'text-end' : ''}`;
+        
+        const messageBubble = document.createElement('div');
+        messageBubble.className = `d-inline-block p-3 rounded ${sender === 'user' ? 'bg-primary text-white' : 'bg-light'}`;
+        messageBubble.style.maxWidth = '70%';
+        messageBubble.textContent = message;
+        
+        messageDiv.appendChild(messageBubble);
+        chatMessages.appendChild(messageDiv);
+        
+        // Scroll to bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function generateBotResponse(message) {
+        const lowerMessage = message.toLowerCase();
+        
+        if (lowerMessage.includes('loan') && lowerMessage.includes('apply')) {
+            return 'To apply for a loan, go to your dashboard and click on "Apply for Loan". You\'ll need to fill out the application form and upload required documents like salary slips and bank statements.';
+        } else if (lowerMessage.includes('shares') || lowerMessage.includes('buy')) {
+            return 'You can buy shares through the "Buy Shares" section in your dashboard. The current share price is KES 100 per share. You can purchase shares using M-Pesa, bank transfer, or cash.';
+        } else if (lowerMessage.includes('document')) {
+            return 'For loan applications, you typically need: salary slips for the last 3 months, bank statements, guarantor information, and proof of employment.';
+        } else if (lowerMessage.includes('status') || lowerMessage.includes('check')) {
+            return 'You can check your loan status in the "My Loans" section of your dashboard. This will show you the current status and any pending actions.';
+        } else {
+            return 'Thank you for your message. If you need specific assistance, please contact our support team at +255 123 456 789 or email support@tblsaccos.co.tz.';
+        }
+    }
+});
+</script>
+{% endblock %}

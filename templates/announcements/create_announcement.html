@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Announcement - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-bullhorn text-primary me-2"></i>Create Announcement
+                </h1>
+                <p class="text-muted mb-0">Share important information with all members</p>
+            </div>
+            <a href="/announcements" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Announcements
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Announcement Details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>Announcement Title *
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text text-muted">Keep it clear and concise</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Category *
+                                </label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Priority Level
+                                </label>
+                                {{ form.priority }}
+                                {% if form.priority.errors %}
+                                    <div class="text-danger small mt-1">{{ form.priority.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.target_audience.id_for_label }}" class="form-label">
+                                    <i class="fas fa-users me-1"></i>Target Audience
+                                </label>
+                                {{ form.target_audience }}
+                                {% if form.target_audience.errors %}
+                                    <div class="text-danger small mt-1">{{ form.target_audience.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Announcement Content *
+                        </label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                            <div class="text-danger small mt-1">{{ form.content.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted">Provide detailed information about the announcement</div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-plus me-1"></i>Start Date *
+                                </label>
+                                {{ form.start_date }}
+                                {% if form.start_date.errors %}
+                                    <div class="text-danger small mt-1">{{ form.start_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-minus me-1"></i>End Date
+                                </label>
+                                {{ form.end_date }}
+                                {% if form.end_date.errors %}
+                                    <div class="text-danger small mt-1">{{ form.end_date.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text text-muted">Leave empty if no expiration</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.attachment.id_for_label }}" class="form-label">
+                                    <i class="fas fa-paperclip me-1"></i>Attachment (Optional)
+                                </label>
+                                {{ form.attachment }}
+                                {% if form.attachment.errors %}
+                                    <div class="text-danger small mt-1">{{ form.attachment.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text text-muted">PDF, DOC, or image files (max 5MB)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.is_published.id_for_label }}" class="form-label">
+                                    <i class="fas fa-globe me-1"></i>Publication Status
+                                </label>
+                                <div class="form-check form-switch">
+                                    {{ form.is_published }}
+                                    <label class="form-check-label" for="{{ form.is_published.id_for_label }}">
+                                        Publish immediately
+                                    </label>
+                                </div>
+                                {% if form.is_published.errors %}
+                                    <div class="text-danger small mt-1">{{ form.is_published.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            <i class="fas fa-sticky-note me-1"></i>Internal Notes (Optional)
+                        </label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted">Notes for staff reference (not visible to members)</div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Fields marked with * are required
+                        </div>
+                        <div>
+                            <button type="reset" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-eraser me-1"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Create Announcement
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Announcement Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Writing Guidelines</h6>
+                    <ul class="list-unstyled text-muted small mb-0">
+                        <li><i class="fas fa-check text-success me-2"></i>Use clear, concise language</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Include all relevant details</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Specify deadlines clearly</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Use appropriate priority levels</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Priority Levels</h6>
+                    <div class="mb-2">
+                        <span class="badge bg-danger me-2">High</span>
+                        <span class="text-muted small">Urgent matters requiring immediate attention</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-warning me-2">Medium</span>
+                        <span class="text-muted small">Important but not urgent</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-info me-2">Low</span>
+                        <span class="text-muted small">General information and updates</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Categories</h6>
+                    <ul class="list-unstyled text-muted small mb-0">
+                        <li><i class="fas fa-info-circle text-info me-2"></i>General - Company-wide updates</li>
+                        <li><i class="fas fa-handshake text-primary me-2"></i>Loans - Loan-related information</li>
+                        <li><i class="fas fa-chart-line text-success me-2"></i>Financial - Financial updates</li>
+                        <li><i class="fas fa-calendar text-warning me-2"></i>Events - Upcoming events</li>
+                        <li><i class="fas fa-exclamation-triangle text-danger me-2"></i>Emergency - Urgent notifications</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Target Audience</h6>
+                    <ul class="list-unstyled text-muted small mb-0">
+                        <li><i class="fas fa-users text-primary me-2"></i>All Members - Everyone</li>
+                        <li><i class="fas fa-user-tie text-info me-2"></i>Staff Only - Internal staff</li>
+                        <li><i class="fas fa-user-graduate text-success me-2"></i>New Members - Recent joiners</li>
+                        <li><i class="fas fa-user-clock text-warning me-2"></i>Active Members - Regular users</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Draft Options</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">You can save announcements as drafts and publish them later.</p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-save me-1"></i>Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-eye me-1"></i>Preview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-resize textarea
+    const contentTextarea = document.getElementById('{{ form.content.id_for_label }}');
+    if (contentTextarea) {
+        contentTextarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+    
+    // Date validation
+    const startDate = document.getElementById('{{ form.start_date.id_for_label }}');
+    const endDate = document.getElementById('{{ form.end_date.id_for_label }}');
+    
+    if (startDate && endDate) {
+        startDate.addEventListener('change', function() {
+            endDate.min = this.value;
+        });
+        
+        endDate.addEventListener('change', function() {
+            if (this.value && startDate.value && this.value < startDate.value) {
+                alert('End date cannot be earlier than start date');
+                this.value = '';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+

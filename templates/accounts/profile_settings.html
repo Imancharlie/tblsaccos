@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profile Settings - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-user-cog text-primary me-2"></i>Profile Settings
+                </h1>
+                <p class="text-muted mb-0">Manage your account information and preferences</p>
+            </div>
+            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Personal Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>First Name *
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Last Name *
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>Email Address *
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>Phone Number *
+                                </label>
+                                {{ form.phone_number }}
+                                {% if form.phone_number.errors %}
+                                    <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.department.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sitemap me-1"></i>Department *
+                                </label>
+                                {{ form.department }}
+                                {% if form.department.errors %}
+                                    <div class="text-danger small mt-1">{{ form.department.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.employee_id.id_for_label }}" class="form-label">
+                                    <i class="fas fa-id-badge me-1"></i>Employee ID *
+                                </label>
+                                {{ form.employee_id }}
+                                {% if form.employee_id.errors %}
+                                    <div class="text-danger small mt-1">{{ form.employee_id.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">
+                            <i class="fas fa-map-marker-alt me-1"></i>Address
+                        </label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                            <div class="text-danger small mt-1">{{ form.address.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">
+                                    <i class="fas fa-city me-1"></i>City
+                                </label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                    <div class="text-danger small mt-1">{{ form.city.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.postal_code.id_for_label }}" class="form-label">
+                                    <i class="fas fa-mail-bulk me-1"></i>Postal Code
+                                </label>
+                                {{ form.postal_code }}
+                                {% if form.postal_code.errors %}
+                                    <div class="text-danger small mt-1">{{ form.postal_code.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
+                            <i class="fas fa-camera me-1"></i>Profile Picture
+                        </label>
+                        {{ form.profile_picture }}
+                        {% if form.profile_picture.errors %}
+                            <div class="text-danger small mt-1">{{ form.profile_picture.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text text-muted">Upload a clear photo (JPG, PNG, max 5MB)</div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Fields marked with * are required
+                        </div>
+                        <div>
+                            <button type="reset" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-eraser me-1"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lock me-2"></i>Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'accounts:change_password' %}">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="current_password" class="form-label">
+                                    <i class="fas fa-key me-1"></i>Current Password *
+                                </label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="new_password1" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>New Password *
+                                </label>
+                                <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                                <div class="form-text text-muted">Minimum 8 characters, include numbers and symbols</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="new_password2" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Confirm New Password *
+                                </label>
+                                <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-key me-1"></i>Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Current Profile -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Current Profile</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" 
+                         class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" 
+                         style="width: 120px; height: 120px;">
+                        <i class="fas fa-user fa-3x text-muted"></i>
+                    </div>
+                {% endif %}
+                
+                <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
+                <p class="text-muted mb-2">{{ user.email }}</p>
+                <p class="text-muted small mb-0">{{ user.profile.department|default:"Department not set" }}</p>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Username</small>
+                    <div class="fw-bold">{{ user.username }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Member Since</small>
+                    <div class="fw-bold">{{ user.date_joined|date:"M d, Y" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Last Login</small>
+                    <div class="fw-bold">{{ user.last_login|date:"M d, Y H:i"|default:"Never" }}</div>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Account Status</small>
+                    <div class="fw-bold">
+                        {% if user.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Tips -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled text-muted small mb-0">
+                    <li><i class="fas fa-check text-success me-2"></i>Use a strong, unique password</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Never share your login credentials</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Log out when using shared devices</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Keep your contact info updated</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Report suspicious activity immediately</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password confirmation validation
+    const newPassword1 = document.getElementById('new_password1');
+    const newPassword2 = document.getElementById('new_password2');
+    
+    if (newPassword1 && newPassword2) {
+        newPassword2.addEventListener('input', function() {
+            if (this.value !== newPassword1.value) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Profile picture preview
+    const profilePictureInput = document.getElementById('{{ form.profile_picture.id_for_label }}');
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.querySelector('.rounded-circle img') || 
+                               document.querySelector('.bg-light .fas').parentElement;
+                    if (img.tagName === 'IMG') {
+                        img.src = e.target.result;
+                    } else {
+                        // Replace icon with image
+                        const newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        newImg.alt = 'Profile Picture';
+                        newImg.className = 'rounded-circle mb-3 mx-auto';
+                        newImg.style.width = '120px';
+                        newImg.style.height = '120px';
+                        newImg.style.objectFit = 'cover';
+                        img.parentElement.replaceChild(newImg, img);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+

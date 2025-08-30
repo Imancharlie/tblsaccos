@@ -1,0 +1,691 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan Application Details - TBL SACCOS{% endblock %}
+
+{% block content %}
+<style>
+    /* Consistent font sizing for loan details */
+    .loan-details-container {
+        font-size: 0.875rem;
+    }
+    
+    .loan-details-container h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .loan-details-container h5 {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .loan-details-container .card-body p {
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .loan-details-container .card-body strong {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    /* Number formatting for currency */
+    .currency-amount {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #28a745;
+    }
+    
+    /* Responsive font sizes */
+    @media (max-width: 768px) {
+        .loan-details-container {
+            font-size: 0.8rem;
+        }
+        
+        .loan-details-container h1 {
+            font-size: 1.3rem;
+        }
+        
+        .loan-details-container h5 {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="loan-details-container">
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-file-alt text-primary"></i> Loan Application Details</h1>
+            <div>
+                <a href="{% url 'loans:export_pdf' loan.pk %}" class="btn btn-success me-2">
+                    <i class="fas fa-download"></i> Export PDF
+                </a>
+                <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Application Overview -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Application Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Application ID:</strong> <span class="badge bg-primary">{{ loan.application_id }}</span></p>
+                        <p><strong>Status:</strong> 
+                            {% if loan.status == 'approved' %}
+                                <span class="badge badge-success">Approved</span>
+                            {% elif loan.status == 'rejected' %}
+                                <span class="badge badge-rejected">Rejected</span>
+                            {% else %}
+                                <span class="badge badge-pending">{{ loan.get_status_display }}</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Application Date:</strong> {{ loan.application_date|date:"F d, Y" }}</p>
+                        <p><strong>Last Updated:</strong> {{ loan.updated_at|date:"F d, Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Applicant:</strong> {{ loan.applicant.get_full_name }}</p>
+                        <p><strong>Phone:</strong> {{ loan.phone_number }}</p>
+                        <p><strong>Department:</strong> {{ loan.department }}</p>
+                        <p><strong>Bank:</strong> {{ loan.bank_name }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Progress -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tasks"></i> Application Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="workflow-progress">
+                    <div class="workflow-step {% if loan.status == 'pending' %}active{% elif loan.status in 'guarantor_approved,hr_reviewed,loan_officer_approved,committee_approved,payment_processing,disbursed' %}completed{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="step-label">Guarantor Approval</div>
+                        {% if loan.guarantor_approval_date %}
+                        <div class="step-date">{{ loan.guarantor_approval_date|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="workflow-step {% if loan.status == 'guarantor_approved' %}active{% elif loan.status in 'hr_reviewed,loan_officer_approved,committee_approved,payment_processing,disbursed' %}completed{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="step-label">HR Review</div>
+                        {% if loan.hr_review_date %}
+                        <div class="step-date">{{ loan.hr_review_date|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="workflow-step {% if loan.status == 'hr_reviewed' %}active{% elif loan.status in 'loan_officer_approved,committee_approved,payment_processing,disbursed' %}completed{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="step-label">Loan Officer</div>
+                        {% if loan.loan_officer_approval_date %}
+                        <div class="step-date">{{ loan.loan_officer_approval_date|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="workflow-step {% if loan.status == 'loan_officer_approved' %}active{% elif loan.status in 'committee_approved,payment_processing,disbursed' %}completed{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="step-label">Committee</div>
+                        {% if loan.committee_approval_date %}
+                        <div class="step-date">{{ loan.committee_approval_date|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="workflow-step {% if loan.status == 'committee_approved' %}active{% elif loan.status in 'payment_processing,disbursed' %}completed{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="step-label">Payment Processing</div>
+                        {% if loan.payment_processing_date %}
+                        <div class="step-date">{{ loan.payment_processing_date|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="workflow-step {% if loan.status == 'payment_processing' %}active{% elif loan.status == 'disbursed' %}completed{% endif %}">
+                        <div class="step-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-label">Disbursed</div>
+                        {% if loan.disbursement_date %}
+                        <div class="step-date">{{ loan.disbursement_date|date:"M d, Y" }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="workflow-status mt-3">
+                    <div class="current-step">
+                        <strong>Current Status:</strong> {{ loan.get_current_workflow_step }}
+                    </div>
+                    <div class="progress mt-2">
+                        <div class="progress-bar" role="progressbar" style="width: {{ loan.get_workflow_progress }}%" 
+                             aria-valuenow="{{ loan.get_workflow_progress }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ loan.get_workflow_progress }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons Based on Status and User Role -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tools"></i> Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if loan.status == 'pending' and user_type == 'member' %}
+                    <!-- Applicant can see guarantor status -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Waiting for Guarantor Approval:</strong> Your application is currently being reviewed by guarantors.
+                    </div>
+                {% elif loan.status == 'guarantor_approved' and user_type == 'hr_officer' %}
+                    <!-- HR Officer can review -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'loans:hr_review' loan.pk %}" class="btn btn-primary">
+                            <i class="fas fa-clipboard-check me-2"></i>HR Review
+                        </a>
+                    </div>
+                {% elif loan.status == 'hr_reviewed' and user_type == 'loan_officer' %}
+                    <!-- Loan Officer can review -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'loans:loan_officer_review' loan.pk %}" class="btn btn-primary">
+                            <i class="fas fa-user-check me-2"></i>Loan Officer Review
+                        </a>
+                    </div>
+                {% elif loan.status == 'loan_officer_approved' and user_type == 'committee_member' %}
+                    <!-- Committee can review -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'loans:committee_review' loan.pk %}" class="btn btn-primary">
+                            <i class="fas fa-gavel me-2"></i>Committee Review
+                        </a>
+                    </div>
+                {% elif loan.status == 'committee_approved' and user_type in 'accountant,admin' %}
+                    <!-- Accountant can process payment -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'loans:accountant_review' loan.pk %}" class="btn btn-success">
+                            <i class="fas fa-credit-card me-2"></i>Process Payment
+                        </a>
+                    </div>
+                {% elif loan.status == 'payment_processing' and user_type in 'accountant,admin' %}
+                    <!-- Accountant can mark as disbursed -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'loans:disburse_loan' loan.pk %}" class="btn btn-success">
+                            <i class="fas fa-check-circle me-2"></i>Mark as Disbursed
+                        </a>
+                    </div>
+                {% elif loan.status == 'disbursed' %}
+                    <!-- Loan has been disbursed -->
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Loan Disbursed:</strong> Your loan has been successfully processed and disbursed.
+                    </div>
+                {% elif loan.status == 'rejected' %}
+                    <!-- Loan was rejected -->
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle me-2"></i>
+                        <strong>Application Rejected:</strong> Your loan application was not approved.
+                    </div>
+                {% else %}
+                    <!-- No actions available -->
+                    <div class="text-muted text-center py-3">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <p>No actions available at this time.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Loan Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Loan Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Purpose:</strong> {{ loan.get_loan_purpose_display }}</p>
+                        <p><strong>Amount:</strong> <span class="text-primary fw-bold">TZS {{ loan.loan_amount|floatformat:0 }}</span></p>
+                        <p><strong>Repayment Period:</strong> {{ loan.repayment_period }} months</p>
+                        <p><strong>Interest Rate:</strong> {{ loan.interest_rate }}% per annum</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Monthly Repayment:</strong> <span class="text-success fw-bold">TZS {{ loan.monthly_repayment|floatformat:0 }}</span></p>
+                        <p><strong>Total Interest:</strong> <span class="text-info fw-bold">TZS {{ loan.total_interest|floatformat:0 }}</span></p>
+                        <p><strong>Total Amount:</strong> <span class="text-warning fw-bold">TZS {{ loan.total_amount|floatformat:0 }}</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approval History -->
+        {% if approvals %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Approval History</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for approval in approvals %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker {% if approval.is_approved %}bg-success{% else %}bg-danger{% endif %}">
+                            <i class="fas {% if approval.is_approved %}fa-check{% else %}fa-times{% endif %}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>{{ approval.get_approval_type_display }}</h6>
+                            <p><strong>Approver:</strong> {{ approval.approver.get_full_name }}</p>
+                            <p><strong>Decision:</strong> 
+                                {% if approval.is_approved %}
+                                    <span class="badge badge-success">Approved</span>
+                                {% else %}
+                                    <span class="badge badge-rejected">Rejected</span>
+                                {% endif %}
+                            </p>
+                            {% if approval.comments %}
+                                <p><strong>Comments:</strong> {{ approval.comments }}</p>
+                            {% endif %}
+                            <p><strong>Date:</strong> {{ approval.approved_at|date:"F d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Repayment Schedule -->
+        {% if repayment_schedule %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Repayment Schedule</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Installment</th>
+                                <th>Due Date</th>
+                                <th>Amount</th>
+                                <th>Principal</th>
+                                <th>Interest</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for installment in repayment_schedule %}
+                            <tr>
+                                <td><strong>{{ installment.installment_number }}</strong></td>
+                                <td>{{ installment.due_date|date:"M d, Y" }}</td>
+                                <td>TZS {{ installment.amount|floatformat:0 }}</td>
+                                <td>TZS {{ installment.principal|floatformat:0 }}</td>
+                                <td>TZS {{ installment.interest|floatformat:0 }}</td>
+                                <td>TZS {{ installment.balance|floatformat:0 }}</td>
+                                <td>
+                                    {% if installment.is_paid %}
+                                        <span class="badge badge-success">Paid</span>
+                                    {% else %}
+                                        <span class="badge badge-pending">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    
+        <!-- Guarantor Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-shield"></i> Guarantors</h5>
+            </div>
+            <div class="card-body">
+                {% for guarantor_approval in guarantor_approvals %}
+                <div class="guarantor-item mb-3 p-3 border rounded">
+                    <h6>{{ guarantor_approval.guarantor.get_full_name }}</h6>
+                    <p class="mb-1"><strong>Savings:</strong> TZS {{ guarantor_approval.savings_amount|floatformat:0 }}</p>
+                    <p class="mb-1"><strong>Shares:</strong> TZS {{ guarantor_approval.shares_amount|floatformat:0 }}</p>
+                    <p class="mb-1"><strong>Total Guarantee:</strong> TZS {{ guarantor_approval.total_guarantee|floatformat:0 }}</p>
+                    <p class="mb-0">
+                        <strong>Status:</strong> 
+                        {% if guarantor_approval.is_approved %}
+                            <span class="badge badge-success">Approved</span>
+                        {% else %}
+                            <span class="badge badge-pending">Pending</span>
+                        {% endif %}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if user == loan.applicant %}
+                    {% if loan.status == 'submitted' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Waiting for guarantor approval
+                        </div>
+                    {% elif loan.status == 'guarantor_approval' %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-clock"></i>
+                            Guarantors are reviewing your application
+                        </div>
+                    {% elif loan.status == 'hr_review' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-users"></i>
+                            HR department is reviewing your application
+                        </div>
+                    {% elif loan.status == 'loan_officer_review' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-user-tie"></i>
+                            Loan officer is reviewing your application
+                        </div>
+                    {% elif loan.status == 'committee_review' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-gavel"></i>
+                            Committee is reviewing your application
+                        </div>
+                    {% elif loan.status == 'approved' %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            Congratulations! Your loan has been approved
+                        </div>
+                    {% elif loan.status == 'rejected' %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle"></i>
+                            Your loan application has been rejected
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'loans:export_pdf' loan.pk %}" class="btn btn-success">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                    {% if user_type == 'hr_officer' and loan.status == 'hr_review' %}
+                        <a href="{% url 'loans:hr_review' loan.pk %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> HR Review
+                        </a>
+                    {% elif user_type == 'loan_officer' and loan.status == 'loan_officer_review' %}
+                        <a href="{% url 'loans:loan_officer_review' loan.pk %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Loan Officer Review
+                        </a>
+                    {% elif user_type == 'committee_member' and loan.status == 'committee_review' %}
+                        <a href="{% url 'loans:committee_review' loan.pk %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Committee Review
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+
+.timeline-content h6 {
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.timeline-content p {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.timeline-item-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.timeline-item-mini i {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.timeline-item-mini.completed i {
+    background: var(--tbl-maroon);
+    color: white;
+}
+
+.timeline-item-mini span {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.guarantor-item {
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.guarantor-item:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+/* Workflow Progress Styling */
+.workflow-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.workflow-progress::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.workflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    border: 3px solid white;
+    transition: all 0.3s ease;
+}
+
+.workflow-step.completed .step-icon {
+    background: #28a745;
+    color: white;
+    transform: scale(1.1);
+}
+
+.workflow-step.active .step-icon {
+    background: #007bff;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.workflow-step:not(.completed):not(.active) .step-icon {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.step-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.25rem;
+}
+
+.step-date {
+    font-size: 0.7rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.workflow-status {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.current-step {
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.progress {
+    height: 8px;
+    border-radius: 4px;
+    background: #e9ecef;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .workflow-progress {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .workflow-progress::before {
+        display: none;
+    }
+    
+    .workflow-step {
+        flex-direction: row;
+        text-align: left;
+        gap: 1rem;
+    }
+    
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 0;
+    }
+    
+    .step-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .step-date {
+        font-size: 0.8rem;
+    }
+}
+</style>
+{% endblock %}
+

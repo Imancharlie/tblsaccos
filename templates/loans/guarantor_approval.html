@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Guarantor Approval - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-shield-alt text-primary me-2"></i>Guarantor Approval
+                </h1>
+                <p class="text-muted mb-0">Review and approve the loan application as a guarantor</p>
+            </div>
+            <a href="{% url 'loans:tracker' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Tracker
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Loan Application Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Applicant:</strong> {{ loan.applicant.get_full_name }}</p>
+                        <p><strong>Loan Type:</strong> {{ loan.loan_type.get_name_display }}</p>
+                        <p><strong>Purpose:</strong> {{ loan.get_purpose_display }}</p>
+                        <p><strong>Amount:</strong> TZS {{ loan.amount|floatformat:0 }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Period:</strong> {{ loan.period }} months</p>
+                        <p><strong>Department:</strong> {{ loan.department }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{% if loan.status == 'pending' %}warning{% elif loan.status == 'guarantor_approved' %}success{% else %}secondary{% endif %}">
+                                {{ loan.get_status_display }}
+                            </span>
+                        </p>
+                        <p><strong>Applied:</strong> {{ loan.created_at|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="text-primary mb-3">Collateral Information</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Savings Value:</strong> TZS {{ loan.savings_value|floatformat:0 }}</p>
+                        <p><strong>Shares Value:</strong> TZS {{ loan.shares_value|floatformat:0 }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if loan.collateral1_description %}
+                            <p><strong>Additional Collateral 1:</strong> {{ loan.collateral1_description }}</p>
+                            <p><strong>Value:</strong> TZS {{ loan.collateral1_value|floatformat:0 }}</p>
+                        {% endif %}
+                        {% if loan.collateral2_description %}
+                            <p><strong>Additional Collateral 2:</strong> {{ loan.collateral2_description }}</p>
+                            <p><strong>Value:</strong> TZS {{ loan.collateral2_value|floatformat:0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Guarantor Approval Form</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">TAMKO LA WADHAMINI</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-3">
+                                    Ninakiri kumfahamu vizuri Ndugu <strong>{{ loan.applicant.get_full_name }}</strong> na nimekubali 
+                                    kumdhamini katika maombi haya ya mkopo. Endapo mkopo huu hautalipwa kulingana na 
+                                    taratibu tulizojiwekew katika Chama, ninaidhinisha Uongozi wa SACCOS kutumia Akiba zangu, 
+                                    Hisa Pamoja na stahiki zangu nyingine ili kufidia chama kwa kiasi kitakachokuwa 
+                                    hakijarejeshwa.
+                                </p>
+                                <div class="form-check">
+                                    {{ form.guarantor_declaration }}
+                                    <label class="form-check-label" for="{{ form.guarantor_declaration.id_for_label }}">
+                                        <strong>Nakubali na kuthibitisha tamko hili</strong>
+                                    </label>
+                                    {% if form.guarantor_declaration.errors %}
+                                        <div class="text-danger small mt-1">{{ form.guarantor_declaration.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.is_approved }}
+                            <label class="form-check-label" for="{{ form.is_approved.id_for_label }}">
+                                <strong>Nakubali kumdhamini mkopo huu</strong>
+                            </label>
+                            {% if form.is_approved.errors %}
+                                <div class="text-danger small mt-1">{{ form.is_approved.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.comments.id_for_label }}" class="form-label">
+                            <i class="fas fa-comment me-1"></i>Maoni au Ushauri (Si lazima)
+                        </label>
+                        {{ form.comments }}
+                        {% if form.comments.errors %}
+                            <div class="text-danger small mt-1">{{ form.comments.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Ukubali tamko na kuchagua kumdhamini mkopo huu
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-1"></i>Submit Approval
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Important Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Your Role as Guarantor</h6>
+                    <p class="text-muted mb-0">
+                        As a guarantor, you are agreeing to be responsible for this loan if the borrower fails to repay it.
+                    </p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">What This Means</h6>
+                    <ul class="list-unstyled text-muted mb-0">
+                        <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>You may be liable for the loan amount</li>
+                        <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>Your savings and shares may be used</li>
+                        <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>This is a serious financial commitment</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2">Before Approving</h6>
+                    <ul class="list-unstyled text-muted mb-0">
+                        <li><i class="fas fa-check text-success me-2"></i>Know the borrower well</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Understand their financial situation</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Be confident they can repay</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const guarantorDeclaration = document.getElementById('{{ form.guarantor_declaration.id_for_label }}');
+    const isApproved = document.getElementById('{{ form.is_approved.id_for_label }}');
+    
+    form.addEventListener('submit', function(e) {
+        if (!guarantorDeclaration.checked) {
+            e.preventDefault();
+            alert('Lazima ukubali tamko la mdhamini ili kuendelea');
+            return false;
+        }
+        
+        if (!isApproved.checked) {
+            e.preventDefault();
+            alert('Lazima ukubali kumdhamini mkopo huu ili kuendelea');
+            return false;
+        }
+        
+        if (!confirm('Una uhakika unataka kumdhamini mkopo huu? Hii ni ahadi ya kifedha muhimu.')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+

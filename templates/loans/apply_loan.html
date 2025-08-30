@@ -1,0 +1,1632 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Apply for Loan - TBL SACCOS{% endblock %}
+
+{% block content %} <br>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>
+                <i class="fas fa-handshake me-2"></i>Apply for Loan
+            </h2>
+            <p>Complete the form below to submit your loan application</p>
+        </div>
+        <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary" style="color: white;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="loan-card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-contract me-2"></i>FOMU YA MAOMBI YA MKOPO</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="loanApplicationForm">
+                    {% csrf_token %}
+                    
+                                        <!-- Section 1: MAELEZO YA MKOPAJI -->
+                    <div class="form-section mb-4">
+                        <h6 class="section-title">
+                            <span class="section-number">1</span>
+                            MAELEZO YA MKOPAJI
+                        </h6>
+                        
+                        <!-- Loan Purpose and Amount -->
+                        <div class="row mb-4">
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.purpose.id_for_label }}" class="form-label">
+                                        <i class="fas fa-home me-1"></i>Lengo la Mkopo *
+                                </label>
+                                    <div class="custom-select-container">
+                                {{ form.purpose }}
+                                        
+                                    </div>
+                                {% if form.purpose.errors %}
+                                    <div class="text-danger small mt-1">{{ form.purpose.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.amount.id_for_label }}" class="form-label">
+                                    <i class="fas fa-coins me-1"></i>Kiasi cha Mkopo unaoombwa TZS *
+                                </label>
+                                {{ form.amount }}
+                                {% if form.amount.errors %}
+                                    <div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Salary Number and Department -->
+                        <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                    <label for="salary_number" class="form-label">
+                                        <i class="fas fa-id-badge me-1"></i>Namba ya Mshahara *
+                                </label>
+                                    <input type="text" class="form-control" id="salary_number" name="salary_number" 
+                                           value="{{ user.member_profile.salary_number|default:'' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.department.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sitemap me-1"></i>Idara *
+                                </label>
+                                {{ form.department }}
+                                {% if form.department.errors %}
+                                    <div class="text-danger small mt-1">{{ form.department.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Loan Period and Phone Number -->
+                        <div class="row mb-4">
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.period.id_for_label }}" class="form-label">
+                                        <i class="fas fa-clock me-1"></i>Muda wa rejesho la mkopo (Miezi) *
+                                    </label>
+                                    {{ form.period }}
+                                    {% if form.period.errors %}
+                                        <div class="text-danger small mt-1">{{ form.period.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-phone-alt me-1"></i>Namba ya simu *
+                                </label>
+                                {{ form.phone_number }}
+                                {% if form.phone_number.errors %}
+                                    <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Account Details -->
+                        <div class="row mb-4">
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.bank_name.id_for_label }}" class="form-label">
+                                    <i class="fas fa-landmark me-1"></i>Jina la benki *
+                                </label>
+                                {{ form.bank_name }}
+                                {% if form.bank_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.bank_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.account_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>Namba ya A/k *
+                                </label>
+                                {{ form.account_number }}
+                                {% if form.account_number.errors %}
+                                    <div class="text-danger small mt-1">{{ form.account_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collateral Section -->
+                        <div class="row mb-4">
+                        <div class="col-12">
+                                <h6 class="text-primary mb-3" style="font-size: 0.9rem; font-weight: 600;">
+                                    <i class="fas fa-shield-alt me-2"></i>DHAMANA ZA MAOMBI HAYA YA MKOPO
+                                </h6>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.savings_value.id_for_label }}" class="form-label">
+                                        <i class="fas fa-piggy-bank me-1"></i>Akiba zangu zenye thamani TZS *
+                                </label>
+                                {{ form.savings_value }}
+                                {% if form.savings_value.errors %}
+                                    <div class="text-danger small mt-1">{{ form.savings_value.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.shares_value.id_for_label }}" class="form-label">
+                                        <i class="fas fa-chart-line me-1"></i>Hisa zenye thamani ya TZS *
+                                </label>
+                                {{ form.shares_value }}
+                                {% if form.shares_value.errors %}
+                                    <div class="text-danger small mt-1">{{ form.shares_value.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.collateral1_description.id_for_label }}" class="form-label">
+                                        <i class="fas fa-home me-1"></i>Maelezo ya Dhamana ya Ziada
+                                </label>
+                                {{ form.collateral1_description }}
+                                {% if form.collateral1_description.errors %}
+                                    <div class="text-danger small mt-1">{{ form.collateral1_description.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="{{ form.collateral1_value.id_for_label }}" class="form-label">
+                                    <i class="fas fa-coins me-1"></i>Thamani ya TZS
+                                </label>
+                                {{ form.collateral1_value }}
+                                {% if form.collateral1_value.errors %}
+                                    <div class="text-danger small mt-1">{{ form.collateral1_value.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        </div>
+
+                        <!-- Guarantors Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3" style="font-size: 0.9rem; font-weight: 600;">
+                                    <i class="fas fa-users me-2"></i>WADHAMINI WA MKOPO
+                                </h6>
+                                <p class="text-muted small mb-3">Lazima uwe na mdhamini wa kwanza na wa pili. Mdhamini wa tatu si lazima.</p>
+                            </div>
+                            
+                            <!-- First Guarantor (Required) -->
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="guarantor1_search" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Mdhamini wa Kwanza *
+                                </label>
+                                    <div class="search-container">
+                                        <input type="text" class="form-control" id="guarantor1_search" 
+                                               placeholder="Tafuta mwanachama..." autocomplete="off">
+                                        <input type="hidden" id="guarantor1_id" name="guarantor1_id">
+                                        <div class="search-results" id="guarantor1_results"></div>
+                                    </div>
+                                    <div class="selected-guarantor" id="guarantor1_selected" style="display: none;">
+                                        <div class="guarantor-info">
+                                            <span class="guarantor-name" id="guarantor1_name_display"></span>
+                                            <button type="button" class="btn-remove" onclick="removeGuarantor(1)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="guarantor1_amount" class="form-label">
+                                        <i class="fas fa-coins me-1"></i>Kiasi cha Dhamana TZS *
+                                </label>
+                                    <input type="number" class="form-control" id="guarantor1_amount" name="guarantor1_amount" 
+                                           placeholder="0.00" min="0" step="0.01" required>
+                            </div>
+                            </div>
+
+                            <!-- Second Guarantor (Required) -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="guarantor2_search" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Mdhamini wa Pili *
+                                    </label>
+                                    <div class="search-container">
+                                        <input type="text" class="form-control" id="guarantor2_search" 
+                                               placeholder="Tafuta mwanachama..." autocomplete="off">
+                                        <input type="hidden" id="guarantor2_id" name="guarantor2_id">
+                                        <div class="search-results" id="guarantor2_results"></div>
+                                    </div>
+                                    <div class="selected-guarantor" id="guarantor2_selected" style="display: none;">
+                                        <div class="guarantor-info">
+                                            <span class="guarantor-name" id="guarantor2_name_display"></span>
+                                            <button type="button" class="btn-remove" onclick="removeGuarantor(2)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="guarantor2_amount" class="form-label">
+                                        <i class="fas fa-coins me-1"></i>Kiasi cha Dhamana TZS *
+                                    </label>
+                                    <input type="number" class="form-control" id="guarantor2_amount" name="guarantor2_amount" 
+                                           placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                            <!-- Third Guarantor (Optional) -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="guarantor3_search" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Mdhamini wa Tatu (Si lazima)
+                                    </label>
+                                    <div class="search-container">
+                                        <input type="text" class="form-control" id="guarantor3_search" 
+                                               placeholder="Tafuta mwanachama..." autocomplete="off">
+                                        <input type="hidden" id="guarantor3_id" name="guarantor3_id">
+                                        <div class="search-results" id="guarantor3_results"></div>
+                                    </div>
+                                    <div class="selected-guarantor" id="guarantor3_selected" style="display: none;">
+                                        <div class="guarantor-info">
+                                            <span class="guarantor-name" id="guarantor3_name_display"></span>
+                                            <button type="button" class="btn-remove" onclick="removeGuarantor(3)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="guarantor3_amount" class="form-label">
+                                        <i class="fas fa-coins me-1"></i>Kiasi cha Dhamana TZS
+                                    </label>
+                                    <input type="number" class="form-control" id="guarantor3_amount" name="guarantor3_amount" 
+                                           placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: TAMKO LA MKOPAJI -->
+                    <div class="form-section mb-4">
+                        <h6 class="section-title">
+                            <span class="section-number">2</span>
+                            TAMKO LA MKOPAJI
+                        </h6>
+                            <div class="loan-card bg-light">
+                                <div class="card-body">
+                                <div class="declaration-text mb-3" style="font-size: 0.8rem; line-height: 1.6;">
+                                    <p class="mb-2">
+                                        Mimi, <span class="text-primary fw-bold" id="userFullName">{{ user.get_full_name|default:user.username }}</span> 
+                                        nathibitisha kuwa nitatumia mkopo ninaouomba kwa lengo nililolitaja hapo juu na wala si vinginevyo. 
+                                        Mkopo huu nitaurejesha kwa kipindi cha miezi 
+                                        <span class="text-primary fw-bold" id="loanPeriod">_____</span> 
+                                        kama nilivyopendekeza katika kipengelenamba 1; taarifa za Mkopaji.
+                                    </p>
+                                    <p class="mb-2">
+                                        Endapo nitashindwa kurejesha mkopo huu kikamilifu katika muda utakaoidhinishwa na Kamati ya Mikopo basi 
+                                        akiba zangu zitumike kufidia kiasi kinachodaiwa na kama hazitoshi, hisa zangu Pamoja na stahiki zangu nyingine 
+                                        zitumike kufidia deni langu katika chama.
+                                    </p>
+                                    <p class="mb-2">
+                                        Endapo jitihada hizi zote hazitakidhi kufidia deni langu, basi uongozi wa TBL SACCOS unaweze kunipeleka 
+                                        kwenye vyombo vya sheria kwa niaba ya chama ili kusaidia jitihada za urejeshaji wa mkopo niliochukua. 
+                                        Pia ninatambua na kuridhia taarifa zangu za mikopo ndani ya chama, zitajumuishwa katika ya kila mwezi 
+                                        katika mamlaka za usimamizi kama itakavyohitajika.
+                                    </p>
+                                </div>
+                                    <div class="form-check">
+                                        {{ form.borrower_declaration }}
+                                        <label class="form-check-label" for="{{ form.borrower_declaration.id_for_label }}" style="font-size: 0.8rem;">
+                                            <strong>Nakubali na kuthibitisha tamko hili</strong>
+                                        </label>
+                                        {% if form.borrower_declaration.errors %}
+                                            <div class="text-danger small mt-1">{{ form.borrower_declaration.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <span class="text-muted small" style="font-size: 0.7rem;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Sehemu zote zilizowekwa alama * zinahitajika
+                    </span>
+                    <hr class="my-4">
+
+                    <!-- Submission Status -->
+                    <div id="submissionStatus" class="alert" style="display: none;">
+                        <div class="d-flex align-items-center">
+                            <div id="statusIcon" class="me-3"></div>
+                            <div id="statusMessage"></div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                                
+                                <div class="d-flex gap-2">
+                                    <button type="reset" class="btn btn-outline-secondary">
+                                <i class="fas fa-eraser me-1"></i>Futa
+                            </button>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-rocket me-1"></i>Wasilisha Maombi
+                            </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="loan-card">
+            <div class="card-header">
+                <h5><i class="fas fa-clipboard-list me-2"></i>Maelezo ya Mkopo</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2" style="font-size: 0.8rem; font-weight: 600;">Mchakato wa Maombi</h6>
+                    <ol class="list-unstyled text-muted mb-0" style="font-size: 0.75rem;">
+                        <li class="mb-1"><strong>1.</strong> Wasilisha maombi</li>
+                        <li class="mb-1"><strong>2.</strong> Idhinisho la Wadhamini</li>
+                        <li class="mb-1"><strong>3.</strong> Mapitio ya HR</li>
+                        <li class="mb-1"><strong>4.</strong> Mapitio ya Afisa wa Mkopo</li>
+                        <li class="mb-1"><strong>5.</strong> Idhinisho la Kamati</li>
+                    </ol>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2" style="font-size: 0.8rem; font-weight: 600;">Muda wa Uchakataji</h6>
+                    <p class="mb-0 text-muted" style="font-size: 0.75rem;">Siku 5-10 za kazi</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-primary mb-2" style="font-size: 0.8rem; font-weight: 600;">Mahitaji</h6>
+                    <ul class="list-unstyled text-muted mb-0" style="font-size: 0.75rem;">
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Mwanachama wa TBL SACCOS</li>
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Akiba za kawaida</li>
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Hakuna mkopo unaoendelea</li>
+                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Mdhamini wa kwanza na wa pili unahitajika</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Debug Panel (Only visible in development) -->
+{% if debug %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="loan-card">
+            <div class="card-header">
+                <h5><i class="fas fa-bug me-2"></i>Debug Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>User Profile Data:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not set" }}</li>
+                            <li><strong>Department:</strong> {{ user.profile.department|default:"Not set" }}</li>
+                            <li><strong>Employee ID:</strong> {{ user.profile.employee_id|default:"Not set" }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Member Profile Data:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Salary Number:</strong> {{ user.member_profile.salary_number|default:"Not set" }}</li>
+                            <li><strong>Bank:</strong> {{ user.member_profile.bank_name|default:"Not set" }}</li>
+                            <li><strong>Account:</strong> {{ user.member_profile.account_number|default:"Not set" }}</li>
+                            <li><strong>Savings:</strong> {{ user.member_profile.total_savings|default:"0" }}</li>
+                            <li><strong>Shares:</strong> {{ user.member_profile.total_shares|default:"0" }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="button" class="btn btn-outline-info btn-sm" onclick="testFormSubmission()">
+                        <i class="fas fa-test-tube me-1"></i>Test Form Submission
+                    </button>
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="clearForm()">
+                        <i class="fas fa-eraser me-1"></i>Clear Form
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="testSimpleSubmission()">
+                        <i class="fas fa-paper-plane me-1"></i>Test Simple Submit
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="testNotification()">
+                        <i class="fas fa-bell me-1"></i>Test Notification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+/* Modern Form Styling */
+.form-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.section-title {
+    color: #495057;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-number {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Custom Select Styling - Modern and Attractive */
+.form-select {
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    cursor: pointer;
+}
+
+.form-select:focus {
+    border-color: #6c757d;
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.form-select:hover {
+    border-color: #6c757d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Select Container */
+.custom-select-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6c757d;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.custom-select-container:hover .select-arrow {
+    color: #495057;
+}
+
+.form-select:focus + .select-arrow {
+    color: #495057;
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Modern Form Styling */
+.form-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.section-title {
+    color: #495057;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-number {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Form Control Styling */
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-control:focus {
+    border-color: #6c757d;
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.form-control:hover {
+    border-color: #6c757d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Search Container Styling */
+.search-container {
+    position: relative;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+.search-result-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(2px);
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item .member-info {
+    flex: 1;
+}
+
+.search-result-item .member-name {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.search-result-item .member-details {
+    font-size: 0.75rem;
+    color: #6c757d;
+    display: flex;
+    gap: 1rem;
+}
+
+.search-result-item .member-id,
+.search-result-item .member-dept {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.search-result-item .member-select {
+    color: #28a745;
+    font-size: 1.1rem;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.search-result-item:hover .member-select {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.selected-guarantor {
+    margin-top: 0.5rem;
+}
+
+.guarantor-info {
+    background: #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.guarantor-name {
+    font-weight: 600;
+    color: #495057;
+}
+
+.btn-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-remove:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Form Label Styling */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label i {
+    color: #6c757d;
+    width: 16px;
+    text-align: center;
+}
+
+/* Card Styling - Grey Header */
+.loan-card {
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.loan-card .card-header {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 1rem 1.5rem;
+    border: none;
+}
+
+.loan-card .card-header h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.loan-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Button Styling */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    border-color: #6c757d;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    transform: translateY(-2px);
+}
+
+/* Declaration Text Styling */
+.declaration-text {
+    background: rgba(108, 117, 125, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #6c757d;
+}
+
+/* Search Container Styling */
+.search-container {
+    position: relative;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+
+
+.selected-guarantor {
+    margin-top: 0.5rem;
+}
+
+.guarantor-info {
+    background: #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.guarantor-name {
+    font-weight: 600;
+    color: #495057;
+}
+
+.btn-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-remove:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Submission Status Styling - Modern & Attractive */
+#submissionStatus {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#submissionStatus::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+#submissionStatus.alert-success {
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4f1d4 100%);
+    color: #1e4d1e;
+    border-left: 4px solid #4caf50;
+    border: 1px solid #c8e6c9;
+}
+
+#submissionStatus.alert-warning {
+    background: linear-gradient(135deg, #f8e8e8 0%, #f1d4d4 100%);
+    color: #4d1e1e;
+    border-left: 4px solid #8b0000;
+    border: 1px solid #e6c8c8;
+}
+
+#submissionStatus.alert-info {
+    background: linear-gradient(135deg, #e8f4f8 0%, #d4e8f1 100%);
+    color: #1e4d4d;
+    border-left: 4px solid #17a2b8;
+    border: 1px solid #c8e6e6;
+}
+
+#submissionStatus .fas {
+    font-size: 1.3rem;
+    margin-right: 0.75rem;
+    opacity: 0.9;
+}
+
+#submissionStatus.alert-success .fas {
+    color: #4caf50;
+}
+
+#submissionStatus.alert-warning .fas {
+    color: #8b0000;
+}
+
+#submissionStatus.alert-info .fas {
+    color: #17a2b8;
+}
+
+/* Loading Button State */
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .loan-card .card-body {
+        padding: 1rem;
+    }
+    
+    .form-section {
+        padding: 1rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .form-control, .form-select {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.85rem;
+    }
+    
+    .search-results {
+        max-height: 150px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.getElementById('{{ form.amount.id_for_label }}');
+    const periodInput = document.getElementById('{{ form.period.id_for_label }}');
+    const userFullName = document.getElementById('userFullName');
+    const loanPeriod = document.getElementById('loanPeriod');
+    
+    // Prefill user data from backend
+    function prefillUserData() {
+        // Prefill phone number from UserProfile
+        const phoneInput = document.getElementById('{{ form.phone_number.id_for_label }}');
+        if (phoneInput && '{{ user.profile.phone_number }}') {
+            phoneInput.value = '{{ user.profile.phone_number }}';
+        }
+        
+        // Prefill department from UserProfile
+        const deptInput = document.getElementById('{{ form.department.id_for_label }}');
+        if (deptInput && '{{ user.profile.department }}') {
+            deptInput.value = '{{ user.profile.department }}';
+        }
+        
+        // Prefill salary number from MemberProfile
+        const salaryInput = document.getElementById('salary_number');
+        if (salaryInput && '{{ user.member_profile.salary_number }}') {
+            salaryInput.value = '{{ user.member_profile.salary_number }}';
+        }
+        
+        // Prefill bank details from MemberProfile
+        const bankInput = document.getElementById('{{ form.bank_name.id_for_label }}');
+        const accountInput = document.getElementById('{{ form.account_number.id_for_label }}');
+        if (bankInput && '{{ user.member_profile.bank_name }}') {
+            bankInput.value = '{{ user.member_profile.bank_name }}';
+        }
+        if (accountInput && '{{ user.member_profile.account_number }}') {
+            accountInput.value = '{{ user.member_profile.account_number }}';
+        }
+        
+        // Prefill savings and shares from MemberProfile
+        const savingsInput = document.getElementById('{{ form.savings_value.id_for_label }}');
+        const sharesInput = document.getElementById('{{ form.shares_value.id_for_label }}');
+        if (savingsInput && '{{ user.member_profile.total_savings }}') {
+            savingsInput.value = '{{ user.member_profile.total_savings }}';
+        }
+        if (sharesInput && '{{ user.member_profile.total_shares }}') {
+            sharesInput.value = '{{ user.member_profile.total_shares }}';
+        }
+        
+        // Log the data being fetched for debugging
+        console.log('User Profile Data:', {
+            phone: '{{ user.profile.phone_number }}',
+            department: '{{ user.profile.department }}',
+            employee_id: '{{ user.profile.employee_id }}'
+        });
+        
+        console.log('Member Profile Data:', {
+            salary_number: '{{ user.member_profile.salary_number }}',
+            bank_name: '{{ user.member_profile.bank_name }}',
+            account_number: '{{ user.member_profile.account_number }}',
+            total_savings: '{{ user.member_profile.total_savings }}',
+            total_shares: '{{ user.member_profile.total_shares }}'
+        });
+    }
+    
+    // Update declaration text when period changes
+    periodInput.addEventListener('change', function() {
+        if (this.value) {
+            loanPeriod.textContent = this.value;
+        } else {
+            loanPeriod.textContent = '_____';
+        }
+    });
+    
+    // Initialize form
+    prefillUserData();
+});
+
+// Guarantor search functionality
+function searchMembers(searchInput, resultsDiv, guarantorId, guarantorNameDisplay, guarantorSelected) {
+    const query = searchInput.value.trim();
+    
+    if (query.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+    
+    // Show loading state
+    resultsDiv.innerHTML = '<div class="search-result-item"><i class="fas fa-spinner fa-spin me-2"></i>Inatafuta...</div>';
+    resultsDiv.style.display = 'block';
+    
+    // Fetch members from backend
+    fetch(`/loans/api/search-members/?q=${encodeURIComponent(query)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.members && data.members.length > 0) {
+                displaySearchResults(resultsDiv, data.members, guarantorId, guarantorNameDisplay, guarantorSelected);
+            } else {
+                resultsDiv.innerHTML = '<div class="search-result-item text-muted"><i class="fas fa-info-circle me-2"></i>Hakuna mwanachama aliyepatikana</div>';
+                resultsDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error searching members:', error);
+            resultsDiv.innerHTML = '<div class="search-result-item text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Hitilafu katika kutafuta. Jaribu tena.</div>';
+            resultsDiv.style.display = 'block';
+        });
+}
+
+function displaySearchResults(resultsDiv, members, guarantorId, guarantorNameDisplay, guarantorSelected) {
+    resultsDiv.innerHTML = '';
+    
+    members.forEach(member => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'search-result-item';
+        resultItem.innerHTML = `
+            <div class="member-name">${member.full_name}</div>
+            <div class="member-details">ID: ${member.employee_id} | ${member.department}</div>
+        `;
+        
+        resultItem.addEventListener('click', () => {
+            selectGuarantor(member, guarantorId, guarantorNameDisplay, guarantorSelected);
+            resultsDiv.style.display = 'none';
+        });
+        
+        resultsDiv.appendChild(resultItem);
+    });
+    
+    resultsDiv.style.display = 'block';
+}
+
+function selectGuarantor(member, guarantorId, guarantorNameDisplay, guarantorSelected) {
+    document.getElementById(guarantorId).value = member.id;
+    guarantorNameDisplay.textContent = member.full_name;
+    guarantorSelected.style.display = 'block';
+}
+
+function removeGuarantor(guarantorNumber) {
+    document.getElementById(`guarantor${guarantorNumber}_id`).value = '';
+    document.getElementById(`guarantor${guarantorNumber}_name_display`).textContent = '';
+    document.getElementById(`guarantor${guarantorNumber}_selected`).style.display = 'none';
+}
+
+// Add event listeners for guarantor search
+document.addEventListener('DOMContentLoaded', function() {
+    // First guarantor
+    const guarantor1Search = document.getElementById('guarantor1_search');
+    if (guarantor1Search) {
+        guarantor1Search.addEventListener('input', function() {
+            searchMembers(
+                this, 
+                document.getElementById('guarantor1_results'),
+                'guarantor1_id',
+                document.getElementById('guarantor1_name_display'),
+                document.getElementById('guarantor1_selected')
+            );
+        });
+    }
+    
+    // Second guarantor
+    const guarantor2Search = document.getElementById('guarantor2_search');
+    if (guarantor2Search) {
+        guarantor2Search.addEventListener('input', function() {
+            searchMembers(
+                this, 
+                document.getElementById('guarantor2_results'),
+                'guarantor2_id',
+                document.getElementById('guarantor2_name_display'),
+                document.getElementById('guarantor2_selected')
+            );
+        });
+    }
+    
+    // Third guarantor
+    const guarantor3Search = document.getElementById('guarantor3_search');
+    if (guarantor3Search) {
+        guarantor3Search.addEventListener('input', function() {
+            searchMembers(
+                this, 
+                document.getElementById('guarantor3_results'),
+                'guarantor3_id',
+                document.getElementById('guarantor3_name_display'),
+                document.getElementById('guarantor3_selected')
+            );
+        });
+    }
+    
+    // Close search results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-container')) {
+            document.querySelectorAll('.search-results').forEach(results => {
+                results.style.display = 'none';
+            });
+        }
+    });
+});
+
+// Guarantor search functionality
+function searchMembers(searchInput, resultsDiv, guarantorId, guarantorNameDisplay, guarantorSelected) {
+    const query = searchInput.value.trim();
+    
+    if (query.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+    
+    // Fetch members from backend
+    fetch(`/loans/api/search-members/?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.members && data.members.length > 0) {
+                displaySearchResults(resultsDiv, data.members, guarantorId, guarantorNameDisplay, guarantorSelected);
+            } else {
+                resultsDiv.innerHTML = '<div class="search-result-item">Hakuna mwanachama aliyepatikana</div>';
+                resultsDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error searching members:', error);
+            resultsDiv.innerHTML = '<div class="search-result-item">Hitilafu katika kutafuta</div>';
+            resultsDiv.style.display = 'block';
+        });
+}
+
+function displaySearchResults(resultsDiv, members, guarantorId, guarantorNameDisplay, guarantorSelected) {
+    resultsDiv.innerHTML = '';
+    
+    members.forEach(member => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'search-result-item';
+        resultItem.innerHTML = `
+            <div class="member-info">
+                <div class="member-name">
+                    <i class="fas fa-user me-2"></i>${member.full_name}
+                </div>
+                <div class="member-details">
+                    <span class="member-id"><i class="fas fa-id-badge me-1"></i>${member.employee_id}</span>
+                    <span class="member-dept"><i class="fas fa-building me-1"></i>${member.department}</span>
+                </div>
+            </div>
+            <div class="member-select">
+                <i class="fas fa-plus-circle text-success"></i>
+            </div>
+        `;
+        
+        resultItem.addEventListener('click', () => {
+            selectGuarantor(member, guarantorId, guarantorNameDisplay, guarantorSelected);
+            resultsDiv.style.display = 'none';
+        });
+        
+        resultsDiv.appendChild(resultItem);
+    });
+    
+    resultsDiv.style.display = 'block';
+}
+
+function selectGuarantor(member, guarantorId, guarantorNameDisplay, guarantorSelected) {
+    document.getElementById(guarantorId).value = member.id;
+    guarantorNameDisplay.textContent = member.full_name;
+    guarantorSelected.style.display = 'block';
+}
+
+function removeGuarantor(guarantorNumber) {
+    document.getElementById(`guarantor${guarantorNumber}_id`).value = '';
+    document.getElementById(`guarantor${guarantorNumber}_name_display`).textContent = '';
+    document.getElementById(`guarantor${guarantorNumber}_selected`).style.display = 'none';
+}
+
+// Add event listeners for guarantor search
+document.addEventListener('DOMContentLoaded', function() {
+    // First guarantor
+    const guarantor1Search = document.getElementById('guarantor1_search');
+    if (guarantor1Search) {
+        guarantor1Search.addEventListener('input', function() {
+            searchMembers(
+                this, 
+                document.getElementById('guarantor1_results'),
+                'guarantor1_id',
+                document.getElementById('guarantor1_name_display'),
+                document.getElementById('guarantor1_selected')
+            );
+        });
+    }
+    
+    // Second guarantor
+    const guarantor2Search = document.getElementById('guarantor2_search');
+    if (guarantor2Search) {
+        guarantor2Search.addEventListener('input', function() {
+            searchMembers(
+                this, 
+                document.getElementById('guarantor2_results'),
+                'guarantor2_id',
+                document.getElementById('guarantor2_name_display'),
+                document.getElementById('guarantor2_selected')
+            );
+        });
+    }
+    
+    // Third guarantor
+    const guarantor3Search = document.getElementById('guarantor3_search');
+    if (guarantor3Search) {
+        guarantor3Search.addEventListener('input', function() {
+            searchMembers(
+                this, 
+                document.getElementById('guarantor3_results'),
+                'guarantor3_id',
+                document.getElementById('guarantor3_name_display'),
+                document.getElementById('guarantor3_selected')
+            );
+        });
+    }
+    
+    // Close search results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-container')) {
+            document.querySelectorAll('.search-results').forEach(results => {
+                results.style.display = 'none';
+            });
+        }
+    });
+});
+
+// Form validation and submission handling
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loanApplicationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submissionStatus = document.getElementById('submissionStatus');
+    const statusIcon = document.getElementById('statusIcon');
+    const statusMessage = document.getElementById('statusMessage');
+    
+    // Debug function to log form data
+    function logFormData() {
+        const formData = new FormData(form);
+        console.log('=== FORM SUBMISSION DEBUG ===');
+        console.log('Form action:', form.action);
+        console.log('Form method:', form.method);
+        console.log('CSRF token:', formData.get('csrfmiddlewaretoken'));
+        
+        // Log all form fields
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+        
+        // Log guarantor data specifically
+        console.log('=== GUARANTOR DATA ===');
+        console.log('Guarantor 1 ID:', document.getElementById('guarantor1_id').value);
+        console.log('Guarantor 1 Amount:', document.getElementById('guarantor1_amount').value);
+        console.log('Guarantor 2 ID:', document.getElementById('guarantor2_id').value);
+        console.log('Guarantor 2 Amount:', document.getElementById('guarantor2_amount').value);
+        console.log('Guarantor 3 ID:', document.getElementById('guarantor3_id').value);
+        console.log('Guarantor 3 Amount:', document.getElementById('guarantor3_amount').value);
+        
+        // Log user profile data
+        console.log('=== USER PROFILE DATA ===');
+        console.log('Phone:', document.getElementById('{{ form.phone_number.id_for_label }}').value);
+        console.log('Department:', document.getElementById('{{ form.department.id_for_label }}').value);
+        console.log('Salary Number:', document.getElementById('salary_number').value);
+        console.log('Bank:', document.getElementById('{{ form.bank_name.id_for_label }}').value);
+        console.log('Account:', document.getElementById('{{ form.account_number.id_for_label }}').value);
+        console.log('Savings:', document.getElementById('{{ form.savings_value.id_for_label }}').value);
+        console.log('Shares:', document.getElementById('{{ form.shares_value.id_for_label }}').value);
+    }
+    
+    // Function to show submission status
+    function showStatus(type, message) {
+        submissionStatus.className = `alert alert-${type}`;
+        
+        // Set appropriate icon based on type
+        let iconClass = '';
+        switch(type) {
+            case 'success':
+                iconClass = 'fas fa-check-circle';
+                break;
+            case 'warning':
+                iconClass = 'fas fa-exclamation-triangle';
+                break;
+            case 'info':
+                iconClass = 'fas fa-info-circle';
+                break;
+            default:
+                iconClass = 'fas fa-info-circle';
+        }
+        
+        statusIcon.innerHTML = `<i class="${iconClass}"></i>`;
+        statusMessage.innerHTML = message;
+        submissionStatus.style.display = 'block';
+        
+        // Add entrance animation
+        submissionStatus.style.opacity = '0';
+        submissionStatus.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            submissionStatus.style.opacity = '1';
+            submissionStatus.style.transform = 'translateY(0)';
+        }, 100);
+        
+        // Scroll to status
+        submissionStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Function to show loading state
+    function showLoading() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Inatumwa...';
+        showStatus('info', '<strong>Inatumwa...</strong> Tafadhali subiri, maombi yako yanatumwa.');
+    }
+    
+    // Function to hide loading state
+    function hideLoading() {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-rocket me-1"></i>Wasilisha Maombi';
+    }
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default submission
+        
+        console.log('=== FORM SUBMISSION STARTED ===');
+        console.log('Form element:', form);
+        console.log('Form action:', form.action);
+        console.log('Form method:', form.method);
+        console.log('Current URL:', window.location.href);
+        
+        // Log form data for debugging
+        logFormData();
+        
+        // Validate borrower declaration
+        const borrowerDeclaration = document.getElementById('{{ form.borrower_declaration.id_for_label }}');
+        if (!borrowerDeclaration.checked) {
+            showStatus('warning', '<strong>Hitilafu:</strong> Lazima ukubali tamko la mkopaji ili kuendelea.');
+            return false;
+        }
+        
+        // Validate guarantors
+        const guarantor1Id = document.getElementById('guarantor1_id').value;
+        const guarantor2Id = document.getElementById('guarantor2_id').value;
+        const guarantor1Amount = parseFloat(document.getElementById('guarantor1_amount').value) || 0;
+        const guarantor2Amount = parseFloat(document.getElementById('guarantor2_amount').value) || 0;
+        
+        if (!guarantor1Id || !guarantor2Id) {
+            showStatus('warning', '<strong>Hitilafu:</strong> Lazima uchague mdhamini wa kwanza na wa pili.');
+            return false;
+        }
+        
+        if (guarantor1Amount <= 0 || guarantor2Amount <= 0) {
+            showStatus('warning', '<strong>Hitilafu:</strong> Lazima uweke kiasi cha dhamana cha mdhamini wa kwanza na wa pili.');
+            return false;
+        }
+        
+        // Validate loan amount
+        const loanAmount = parseFloat(document.getElementById('{{ form.amount.id_for_label }}').value) || 0;
+        if (loanAmount <= 0) {
+            showStatus('warning', '<strong>Hitilafu:</strong> Lazima uweke kiasi cha mkopo cha sahihi.');
+            return false;
+        }
+        
+        // Validate collateral
+        const savingsValue = parseFloat(document.getElementById('{{ form.savings_value.id_for_label }}').value) || 0;
+        const sharesValue = parseFloat(document.getElementById('{{ form.shares_value.id_for_label }}').value) || 0;
+        
+        if (savingsValue + sharesValue < loanAmount * 0.5) {
+            if (!confirm('Thamani ya dhamana yako ni chini ya 50% ya kiasi cha mkopo. Una uhakika unataka kuendelea?')) {
+                return false;
+            }
+        }
+        
+        // Show loading state
+        showLoading();
+        
+        // Submit form via AJAX
+        const formData = new FormData(form);
+        
+        // Ensure CSRF token is included
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        console.log('Submitting to:', window.location.pathname);
+        console.log('CSRF Token:', csrfToken);
+        console.log('Form data being sent:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+        
+        fetch(window.location.pathname, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            console.log('Response URL:', response.url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return response.text();
+        })
+        .then(response => {
+            // Try to parse as JSON first
+            try {
+                const data = JSON.parse(response);
+                console.log('JSON Response:', data);
+                
+                if (data.success) {
+                    showStatus('success', '<strong>Imefanikiwa!</strong> Maombi yako ya mkopo yamewasilishwa kikamilifu. Utapokea ujumbe wa uthibitisho hivi karibuni.');
+                    
+                    // Reset form after successful submission
+                    setTimeout(() => {
+                        form.reset();
+                        submissionStatus.style.display = 'none';
+                        // Reset guarantor selections
+                        document.querySelectorAll('.selected-guarantor').forEach(el => el.style.display = 'none');
+                        document.querySelectorAll('input[id*="guarantor"]').forEach(input => input.value = '');
+                        
+                        // Redirect to application detail if URL provided
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        }
+                    }, 3000);
+                    
+                } else {
+                    showStatus('warning', '<strong>Hitilafu:</strong> ' + (data.message || 'Kuna tatizo katika maombi yako.'));
+                }
+            } catch (e) {
+                // Fallback to text parsing for non-JSON responses
+                console.log('Text Response:', response);
+                
+                if (response.includes('success') || response.includes('successfully') || response.includes('redirect')) {
+                    showStatus('success', '<strong>Imefanikiwa!</strong> Maombi yako ya mkopo yamewasilishwa kikamilifu.');
+                    
+                    // Reset form after successful submission
+                    setTimeout(() => {
+                        form.reset();
+                        submissionStatus.style.display = 'none';
+                        // Reset guarantor selections
+                        document.querySelectorAll('.selected-guarantor').forEach(el => el.style.display = 'none');
+                        document.querySelectorAll('input[id*="guarantor"]').forEach(input => input.value = '');
+                    }, 3000);
+                    
+                } else if (response.includes('error') || response.includes('invalid') || response.includes('required')) {
+                    showStatus('warning', '<strong>Hitilafu:</strong> Kuna tatizo katika maombi yako. Tafadhali angalia taarifa zote na jaribu tena.');
+                } else {
+                    showStatus('info', '<strong>Imewasilishwa:</strong> Maombi yako yamewasilishwa. Tafadhali subiri uthibitisho.');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Submission error:', error);
+            showStatus('warning', '<strong>Hitilafu ya Mtandao:</strong> Kuna tatizo la mtandao. Jaribu kuwasilisha tena au tafadhali wasilisha kwa njia ya kawaida.');
+            
+            // Fallback to regular form submission after 3 seconds
+            setTimeout(() => {
+                console.log('Falling back to regular form submission...');
+                form.removeEventListener('submit', arguments.callee);
+                form.submit();
+            }, 3000);
+        })
+        .finally(() => {
+            hideLoading();
+    });
+});
+});
+
+// Debug functions
+function testFormSubmission() {
+    console.log('=== TESTING FORM SUBMISSION ===');
+    
+    // Test form data collection
+    const form = document.getElementById('loanApplicationForm');
+    const formData = new FormData(form);
+    
+    console.log('Form action:', form.action);
+    console.log('Form method:', form.method);
+    console.log('CSRF token:', formData.get('csrfmiddlewaretoken'));
+    
+    // Test all form fields
+    console.log('=== FORM FIELD VALUES ===');
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+    }
+    
+    // Test guarantor data
+    console.log('=== GUARANTOR TEST DATA ===');
+    console.log('Guarantor 1 ID:', document.getElementById('guarantor1_id').value);
+    console.log('Guarantor 1 Amount:', document.getElementById('guarantor1_amount').value);
+    console.log('Guarantor 2 ID:', document.getElementById('guarantor2_id').value);
+    console.log('Guarantor 2 Amount:', document.getElementById('guarantor2_amount').value);
+    
+    // Test user profile data
+    console.log('=== USER PROFILE TEST DATA ===');
+    console.log('Phone:', document.getElementById('{{ form.phone_number.id_for_label }}').value);
+    console.log('Department:', document.getElementById('{{ form.department.id_for_label }}').value);
+    console.log('Salary Number:', document.getElementById('salary_number').value);
+    
+    alert('Form test completed! Check console for details.');
+}
+
+function clearForm() {
+    const form = document.getElementById('loanApplicationForm');
+    form.reset();
+    
+    // Clear guarantor selections
+    document.querySelectorAll('.selected-guarantor').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('input[id*="guarantor"]').forEach(input => input.value = '');
+    
+    // Hide submission status
+    document.getElementById('submissionStatus').style.display = 'none';
+    
+    // Reset submit button
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-rocket me-1"></i>Wasilisha Maombi';
+    
+    console.log('Form cleared successfully!');
+    alert('Form has been cleared!');
+}
+
+function testNotification() {
+    console.log('Testing notification system...');
+    
+    // Test success notification
+    showStatus('success', '<strong>Test Success!</strong> This is a test success notification.');
+    
+    // Test warning notification after 2 seconds
+    setTimeout(() => {
+        showStatus('warning', '<strong>Test Warning!</strong> This is a test warning notification.');
+    }, 2000);
+    
+    // Test info notification after 4 seconds
+    setTimeout(() => {
+        showStatus('info', '<strong>Test Info!</strong> This is a test info notification.');
+    }, 4000);
+}
+
+function testSimpleSubmission() {
+    console.log('=== TESTING SIMPLE SUBMISSION ===');
+    
+    // Fill in minimal required data
+    const form = document.getElementById('loanApplicationForm');
+    
+    // Set some basic values
+    document.getElementById('{{ form.purpose.id_for_label }}').value = 'home_improvement';
+    document.getElementById('{{ form.amount.id_for_label }}').value = '100000';
+    document.getElementById('salary_number').value = 'TEST001';
+    document.getElementById('{{ form.department.id_for_label }}').value = 'Test Department';
+    document.getElementById('{{ form.period.id_for_label }}').value = '12';
+    document.getElementById('{{ form.phone_number.id_for_label }}').value = '0712345678';
+    document.getElementById('{{ form.bank_name.id_for_label }}').value = 'Test Bank';
+    document.getElementById('{{ form.account_number.id_for_label }}').value = '1234567890';
+    document.getElementById('{{ form.savings_value.id_for_label }}').value = '50000';
+    document.getElementById('{{ form.shares_value.id_for_label }}').value = '25000';
+    
+    // Set guarantor IDs (use current user for testing)
+    document.getElementById('guarantor1_id').value = '{{ user.id }}';
+    document.getElementById('guarantor2_id').value = '{{ user.id }}';
+    document.getElementById('guarantor1_amount').value = '50000';
+    document.getElementById('guarantor2_amount').value = '50000';
+    
+    // Check borrower declaration
+    document.getElementById('{{ form.borrower_declaration.id_for_label }}').checked = true;
+    
+    console.log('Form filled with test data');
+    console.log('Attempting simple submission...');
+    
+    // Try to submit
+    form.submit();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Loan Details - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-file-invoice-dollar text-primary me-2"></i>Loan Details
+                </h1>
+                <p class="text-muted mb-0">Comprehensive information about Loan #{{ loan.id }}</p>
+            </div>
+            <div>
+                <a href="{% url 'loans:my_loans' %}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to My Loans
+                </a>
+                <a href="{% url 'loans:make_payment' loan.id %}" class="btn btn-success">
+                    <i class="fas fa-credit-card me-2"></i>Make Payment
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Loan Information -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Loan Information
+                    </h5>
+                    <span class="badge bg-success">Active</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <small class="text-muted">Loan ID</small>
+                            <div class="fw-bold">#{{ loan.id }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Purpose</small>
+                            <div class="fw-bold">{{ loan.purpose }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Original Amount</small>
+                            <div class="fw-bold text-primary">TZS {{ loan.amount|floatformat:0 }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Loan Period</small>
+                            <div class="fw-bold">{{ loan.period }} months</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <small class="text-muted">Application Date</small>
+                            <div class="fw-bold">{{ loan.created_at|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Disbursed Date</small>
+                            <div class="fw-bold">{{ loan.disbursed_date|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Due Date</small>
+                            <div class="fw-bold">{{ loan.due_date|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Interest Rate</small>
+                            <div class="fw-bold text-success">0% (No Interest)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Progress -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Payment Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-3">
+                            <h4 class="text-primary mb-1">{{ loan.payment_percentage|floatformat:1 }}%</h4>
+                            <small class="text-muted">Complete</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-3">
+                            <h4 class="text-success mb-1">{{ loan.payments_made }}</h4>
+                            <small class="text-muted">Payments Made</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-3">
+                            <h4 class="text-warning mb-1">{{ loan.period|add:"-"|add:loan.payments_made }}</h4>
+                            <small class="text-muted">Remaining</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-3">
+                            <h4 class="text-info mb-1">{{ loan.period }}</h4>
+                            <small class="text-muted">Total Months</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted">Payment Progress</small>
+                        <small class="text-muted">{{ loan.payment_percentage|floatformat:1 }}%</small>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ loan.payment_percentage }}%"
+                             aria-valuenow="{{ loan.payment_percentage }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <small class="text-muted">Monthly Payment</small>
+                            <div class="fw-bold">TZS {{ loan.monthly_payment|floatformat:0 }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Total Paid</small>
+                            <div class="fw-bold text-success">TZS {{ loan.total_paid|floatformat:0 }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <small class="text-muted">Remaining Balance</small>
+                            <div class="fw-bold text-danger">TZS {{ loan.remaining_balance|floatformat:0 }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Next Payment Date</small>
+                            <div class="fw-bold">{{ loan.next_payment_date|date:"M d, Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Payment History</h5>
+            </div>
+            <div class="card-body">
+                {% if loan.payments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Reference</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in loan.payments %}
+                                <tr>
+                                    <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                                    <td class="text-success fw-bold">TZS {{ payment.amount|floatformat:0 }}</td>
+                                    <td>{{ payment.payment_method }}</td>
+                                    <td><small class="text-muted">{{ payment.reference_number }}</small></td>
+                                    <td>
+                                        <span class="badge bg-success">Completed</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-history fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No payment history available yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Loan Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Loan Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Original Amount:</span>
+                    <span class="fw-bold">TZS {{ loan.amount|floatformat:0 }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Paid:</span>
+                    <span class="fw-bold text-success">TZS {{ loan.total_paid|floatformat:0 }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-bold">Remaining:</span>
+                    <span class="fw-bold text-danger">TZS {{ loan.remaining_balance|floatformat:0 }}</span>
+                </div>
+                
+                <div class="mt-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'loans:make_payment' loan.id %}" class="btn btn-success">
+                            <i class="fas fa-credit-card me-2"></i>Make Payment
+                        </a>
+                        <a href="{% url 'loans:payment_history' loan.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-history me-2"></i>Full Payment History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loan Timeline -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Loan Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline-vertical">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Application Submitted</h6>
+                            <small class="text-muted">{{ loan.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Loan Approved</h6>
+                            <small class="text-muted">{{ loan.approved_date|date:"M d, Y"|default:"Pending" }}</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-info"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Loan Disbursed</h6>
+                            <small class="text-muted">{{ loan.disbursed_date|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-warning"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Due Date</h6>
+                            <small class="text-muted">{{ loan.due_date|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'loans:download_statement' loan.id %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-download me-2"></i>Download Statement
+                    </a>
+                    <a href="{% url 'loans:request_extension' loan.id %}" class="btn btn-outline-warning btn-sm">
+                        <i class="fas fa-calendar-plus me-2"></i>Request Extension
+                    </a>
+                    <a href="{% url 'loans:contact_support' loan.id %}" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-headset me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-vertical {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    padding-left: 10px;
+}
+
+.progress {
+    border-radius: 0;
+}
+
+.progress-bar {
+    border-radius: 0;
+}
+
+.card {
+    border-radius: 0;
+}
+
+.badge {
+    border-radius: 0;
+}
+</style>
+{% endblock %}

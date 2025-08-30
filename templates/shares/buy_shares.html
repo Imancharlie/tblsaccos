@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Buy Shares - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Buy Shares</h1>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'shares:my_shares' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-pie me-2"></i>My Shares
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Purchase Shares</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="share_price" class="form-label">Share Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">KES</span>
+                                    <input type="text" class="form-control" id="share_price" value="{{ share_price }}" readonly>
+                                </div>
+                                <small class="text-muted">Current market price per share</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="available_shares" class="form-label">Available Shares</label>
+                                <input type="text" class="form-control" id="available_shares" value="{{ available_shares }}" readonly>
+                                <small class="text-muted">Total shares available for purchase</small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="quantity" class="form-label">Number of Shares</label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" max="{{ available_shares }}" required>
+                                <small class="text-muted">Enter the number of shares you want to buy</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="total_cost" class="form-label">Total Cost</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">KES</span>
+                                    <input type="text" class="form-control" id="total_cost" readonly>
+                                </div>
+                                <small class="text-muted">Total amount to be deducted</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="payment_method" class="form-label">Payment Method</label>
+                                <select class="form-select" id="payment_method" name="payment_method" required>
+                                    <option value="">Select payment method</option>
+                                    <option value="mpesa">M-Pesa</option>
+                                    <option value="bank">Bank Transfer</option>
+                                    <option value="cash">Cash</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-cart me-2"></i>Purchase Shares
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Share Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary">Current Share Price</h6>
+                        <p class="h4 text-success">KES {{ share_price }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary">Available Shares</h6>
+                        <p class="h4 text-info">{{ available_shares }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary">Minimum Purchase</h6>
+                        <p class="h6 text-muted">1 share</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary">Maximum Purchase</h6>
+                        <p class="h6 text-muted">{{ available_shares }} shares</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Benefits of Owning Shares</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Dividend payments
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Voting rights
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Loan eligibility
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Ownership stake
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const quantityInput = document.getElementById('quantity');
+    const totalCostInput = document.getElementById('total_cost');
+    const sharePrice = {{ share_price }};
+    
+    function calculateTotal() {
+        const quantity = parseInt(quantityInput.value) || 0;
+        const total = quantity * sharePrice;
+        totalCostInput.value = total.toLocaleString();
+    }
+    
+    quantityInput.addEventListener('input', calculateTotal);
+});
+</script>
+{% endblock %}
+
+
+
+
+

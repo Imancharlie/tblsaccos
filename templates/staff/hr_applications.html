@@ -1,0 +1,186 @@
+{% comment %}{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}HR Applications - TBL SACCOS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-2">
+                    <i class="fas fa-user-tie text-primary me-2"></i>HR Applications
+                </h1>
+                <p class="text-muted mb-0">Review and manage loan applications pending HR review</p>
+            </div>
+            <a href="{% url 'staff:hr_workspace' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Workspace
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Pending HR Review
+                    <span class="badge bg-warning ms-2">{{ applications.count }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if applications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Applicant</th>
+                                    <th>Loan Type</th>
+                                    <th>Purpose</th>
+                                    <th>Amount</th>
+                                    <th>Period</th>
+                                    <th>Department</th>
+                                    <th>Guarantor Status</th>
+                                    <th>Applied Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-2">
+                                                                        {% if application.applicant.profile.profile_picture %}
+                        <img src="{{ application.applicant.profile.profile_picture.url }}" 
+                                                         alt="Profile" class="rounded-circle" width="32" height="32">
+                                                {% else %}
+                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                                         style="width: 32px; height: 32px;">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <strong>{{ application.applicant.get_full_name }}</strong>
+                                                <br><small class="text-muted">{{ application.applicant.email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ application.loan_type.get_name_display }}</span>
+                                    </td>
+                                    <td>{{ application.get_purpose_display }}</td>
+                                    <td>
+                                        <strong>TZS {{ application.amount|floatformat:0 }}</strong>
+                                    </td>
+                                    <td>{{ application.period }} months</td>
+                                    <td>{{ application.department }}</td>
+                                    <td>
+                                        {% if application.guarantor_approvals.all %}
+                                            {% for approval in application.guarantor_approvals.all %}
+                                                {% if approval.is_approved %}
+                                                    <span class="badge bg-success">{{ approval.guarantor.get_full_name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">{{ approval.guarantor.get_full_name }}</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <span class="badge bg-secondary">No Guarantors</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ application.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'loans:application_detail' application.id %}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'loans:hr_review' application.id %}" 
+                                               class="btn btn-sm btn-success" 
+                                               title="Review Application">
+                                                <i class="fas fa-clipboard-check"></i> Review
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="text-muted mb-3">
+                            <i class="fas fa-inbox fa-3x"></i>
+                        </div>
+                        <h5 class="text-muted">No Pending HR Review</h5>
+                        <p class="text-muted mb-0">All loan applications have been reviewed or are in other stages.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if applications %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Quick Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h3 text-primary mb-1">{{ applications.count }}</div>
+                            <div class="text-muted">Pending Review</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h3 text-success mb-1">
+                                TZS {{ total_amount|floatformat:0 }}
+                            </div>
+                            <div class="text-muted">Total Amount</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h3 text-info mb-1">
+                                {{ applications|length|add:"-1"|add:"1" }}
+                            </div>
+                            <div class="text-muted">Applications</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h3 text-warning mb-1">
+                                {% if applications %}
+                                    {{ applications|length|floatformat:0 }}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </div>
+                            <div class="text-muted">To Process</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any JavaScript functionality here
+    console.log('HR Applications page loaded');
+});
+</script>
+{% endblock %}
+ {{ url 'loans:hr_review' application.id }} {% endcomment %}
