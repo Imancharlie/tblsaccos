@@ -1,0 +1,9 @@
+# Minimal requirements for TBL SACCOS - Python 3.9 compatible
+Django==4.2.7
+crispy-forms==2.0
+crispy-bootstrap5==0.7
+django-widget-tweaks==1.5.0
+whitenoise==6.5.0
+Pillow==9.5.0
+reportlab==3.6.12
+gunicorn==20.1.0
